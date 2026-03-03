@@ -1,88 +1,116 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Somnus — 产品预览</title>
+  <title>Somnus — 3D Preview</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400&family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --walnut: #4a3728;
-      --walnut-light: #6b4f3a;
-      --cream: #f5f0e8;
-      --stone: #c8bfb0;
-      --dark: #1a1612;
-      --accent: #b8956a;
+      --white: #ffffff;
+      --off-white: #f8f6f2;
+      --warm-grey: #e8e4de;
+      --mid-grey: #b0a99e;
+      --dark: #2a2420;
+      --text: #3a3330;
+      --accent: #8b7355;
+      --accent-light: #c4a882;
+      --border: #ddd8d0;
     }
 
     body {
-      background: var(--dark);
-      color: var(--cream);
-      font-family: 'Jost', sans-serif;
-      font-weight: 200;
+      background: var(--white);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    /* ── Header ── */
+    /* Header */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 28px 40px;
-      border-bottom: 1px solid rgba(200,191,176,0.12);
-      position: relative;
-      z-index: 10;
+      padding: 22px 48px;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
     }
 
     .logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 1.6rem;
-      letter-spacing: 0.25em;
-      color: var(--cream);
-      text-transform: uppercase;
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 1.5rem;
+      letter-spacing: 0.08em;
+      color: var(--dark);
     }
 
-    .logo span { color: var(--accent); }
+    .header-nav {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
 
-    .header-tag {
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
+    .header-nav a {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--stone);
+      color: var(--text);
+      text-decoration: none;
       opacity: 0.7;
+      transition: opacity 0.2s;
     }
+    .header-nav a:hover { opacity: 1; }
 
-    /* ── Layout ── */
+    .header-cta {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--dark);
+      padding: 10px 22px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .header-cta:hover { background: var(--accent); }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      padding: 12px 48px;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--mid-grey);
+      border-bottom: 1px solid var(--border);
+    }
+    .breadcrumb span { margin: 0 6px; }
+
+    /* Main Layout */
     .main {
       display: grid;
-      grid-template-columns: 1fr 340px;
-      min-height: calc(100vh - 81px);
+      grid-template-columns: 1fr 380px;
+      min-height: calc(100vh - 121px);
     }
 
-    /* ── Viewer ── */
+    /* Viewer */
     .viewer-wrap {
       position: relative;
-      background: linear-gradient(145deg, #1e1916 0%, #0f0d0b 100%);
+      background: var(--off-white);
+      overflow: hidden;
     }
 
     model-viewer {
       width: 100%;
       height: 100%;
-      min-height: 600px;
+      min-height: 620px;
       --poster-color: transparent;
       background-color: transparent;
     }
 
-    /* Hide default AR button — we use our own */
     model-viewer::part(default-ar-button) { display: none; }
 
-    /* Loading overlay */
     .loading-overlay {
       position: absolute;
       inset: 0;
@@ -90,429 +118,474 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      background: #0f0d0b;
-      transition: opacity 0.6s ease;
+      gap: 20px;
+      background: var(--off-white);
+      transition: opacity 0.8s ease;
       pointer-events: none;
-      z-index: 5;
+      z-index: 10;
     }
     .loading-overlay.hidden { opacity: 0; }
 
-    .loader-ring {
-      width: 48px; height: 48px;
-      border: 1px solid rgba(184,149,106,0.2);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .loader-bar {
+      width: 120px;
+      height: 1px;
+      background: var(--border);
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-bar::after {
+      content: '';
+      position: absolute;
+      left: -40%;
+      top: 0;
+      width: 40%;
+      height: 100%;
+      background: var(--accent);
+      animation: slide 1.2s ease-in-out infinite;
+    }
+    @keyframes slide { 0% { left: -40%; } 100% { left: 120%; } }
 
     .loading-text {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--stone);
+      color: var(--mid-grey);
     }
 
-    /* Viewer label */
-    .viewer-label {
+    .viewer-hint {
       position: absolute;
-      bottom: 24px;
-      left: 28px;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: rgba(200,191,176,0.35);
+      color: var(--mid-grey);
       pointer-events: none;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .viewer-hint::before, .viewer-hint::after {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--border);
     }
 
-    /* ── Sidebar ── */
+    /* Sidebar */
     .sidebar {
-      border-left: 1px solid rgba(200,191,176,0.1);
+      border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      padding: 40px 32px;
-      gap: 40px;
-      background: rgba(26,22,18,0.95);
+      background: var(--white);
+      overflow-y: auto;
+    }
+
+    .sidebar-inner {
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      flex: 1;
+    }
+
+    .product-category {
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
     }
 
     .product-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
       font-weight: 300;
-      line-height: 1.2;
-      color: var(--cream);
+      line-height: 1.15;
+      color: var(--dark);
     }
 
-    .product-sku {
-      font-size: 0.6rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-top: 6px;
+    .product-subtitle {
+      font-size: 0.75rem;
+      color: var(--mid-grey);
+      margin-top: 10px;
+      letter-spacing: 0.05em;
+      line-height: 1.6;
     }
 
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, rgba(200,191,176,0.15) 0%, transparent 100%);
-    }
+    .divider { height: 1px; background: var(--border); }
 
-    /* ── Controls ── */
-    .section-label {
-      font-size: 0.6rem;
+    .section-title {
+      font-size: 0.58rem;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: var(--stone);
-      opacity: 0.6;
-      margin-bottom: 16px;
+      color: var(--mid-grey);
+      margin-bottom: 18px;
     }
 
-    .drawer-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .drawer-btn {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      background: transparent;
-      border: 1px solid rgba(200,191,176,0.15);
-      color: var(--cream);
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.8rem;
-      letter-spacing: 0.15em;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      text-align: left;
-    }
-
-    .drawer-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(184,149,106,0.08) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .drawer-btn:hover::before { opacity: 1; }
-    .drawer-btn:hover { border-color: rgba(184,149,106,0.4); }
-
-    .drawer-btn.active {
-      border-color: var(--accent);
-      background: rgba(184,149,106,0.06);
-    }
-
-    .btn-icon {
-      width: 32px; height: 32px;
-      border: 1px solid rgba(200,191,176,0.2);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: border-color 0.3s;
-    }
-    .drawer-btn.active .btn-icon { border-color: var(--accent); }
-
-    .btn-icon svg {
-      width: 14px; height: 14px;
-      stroke: var(--stone);
-      fill: none;
-      stroke-width: 1.5;
-      transition: stroke 0.3s, transform 0.4s ease;
-    }
-    .drawer-btn.active .btn-icon svg { stroke: var(--accent); }
-
-    /* Arrow icon rotates when open */
-    .drawer-btn.active .btn-icon svg.arrow { transform: translateX(4px); }
-
-    .btn-text { flex: 1; }
-    .btn-name {
-      display: block;
-      color: var(--cream);
-      margin-bottom: 2px;
-    }
-    .btn-state {
-      display: block;
-      font-size: 0.65rem;
-      color: var(--stone);
-      opacity: 0.5;
-      letter-spacing: 0.1em;
-    }
-
-    /* All drawers toggle */
-    .all-btn {
-      margin-top: 4px;
-      padding: 14px 20px;
-      background: rgba(184,149,106,0.08);
-      border: 1px solid rgba(184,149,106,0.25);
-      color: var(--accent);
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .all-btn:hover {
-      background: rgba(184,149,106,0.15);
-      border-color: var(--accent);
-    }
-
-    /* ── AR Button ── */
-    .ar-section { margin-top: auto; }
-
-    .ar-btn {
-      width: 100%;
-      padding: 18px 24px;
-      background: var(--walnut);
-      border: none;
-      color: var(--cream);
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.8rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-    .ar-btn:hover { background: var(--walnut-light); }
-
-    .ar-btn svg {
-      width: 18px; height: 18px;
-      stroke: var(--accent);
-      fill: none;
-      stroke-width: 1.5;
-    }
-
-    .ar-note {
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      color: var(--stone);
-      opacity: 0.4;
-      text-align: center;
-      margin-top: 10px;
-      text-transform: uppercase;
-    }
-
-    /* ── Specs ── */
-    .specs { display: flex; flex-direction: column; gap: 10px; }
+    /* Specs */
+    .specs { display: flex; flex-direction: column; }
 
     .spec-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(200,191,176,0.06);
+      padding: 11px 0;
+      border-bottom: 1px solid var(--warm-grey);
     }
-    .spec-row:last-child { border-bottom: none; }
+    .spec-row:first-child { border-top: 1px solid var(--warm-grey); }
 
     .spec-key {
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--stone);
-      opacity: 0.5;
+      color: var(--mid-grey);
     }
     .spec-val {
-      font-size: 0.75rem;
-      color: var(--cream);
-      letter-spacing: 0.05em;
+      font-size: 0.78rem;
+      color: var(--dark);
+      font-weight: 400;
     }
 
-    /* ── Mobile ── */
-    @media (max-width: 768px) {
-      .main { grid-template-columns: 1fr; grid-template-rows: 60vh auto; }
-      .sidebar { border-left: none; border-top: 1px solid rgba(200,191,176,0.1); padding: 28px 20px; }
-      header { padding: 20px; }
-      model-viewer { min-height: unset; }
+    /* Drawer Toggle Button */
+    .toggle-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      gap: 16px;
+    }
+
+    .toggle-btn:hover {
+      background: var(--warm-grey);
+      border-color: var(--accent-light);
+    }
+
+    .toggle-btn.open {
+      background: var(--dark);
+      border-color: var(--dark);
+    }
+
+    .toggle-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Mini drawer icon */
+    .drawer-icon {
+      width: 32px;
+      height: 24px;
+      border: 1.5px solid var(--mid-grey);
+      position: relative;
+      flex-shrink: 0;
+      transition: border-color 0.3s;
+    }
+    .toggle-btn.open .drawer-icon { border-color: rgba(255,255,255,0.3); }
+
+    .drawer-icon .d-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .toggle-btn.open .drawer-icon .d-line { background: rgba(255,255,255,0.15); }
+
+    .drawer-icon .d-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 9px;
+      height: 2.5px;
+      background: var(--mid-grey);
+      transition: left 0.5s ease, background 0.3s;
+    }
+    .toggle-btn.open .drawer-icon .d-handle {
+      left: calc(50% + 7px);
+      background: rgba(255,255,255,0.4);
+    }
+
+    .toggle-text { text-align: left; }
+
+    .toggle-label {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dark);
+      transition: color 0.3s;
+    }
+    .toggle-btn.open .toggle-label { color: var(--white); }
+
+    .toggle-sub {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      color: var(--mid-grey);
+      margin-top: 2px;
+      transition: color 0.3s;
+    }
+    .toggle-btn.open .toggle-sub { color: rgba(255,255,255,0.4); }
+
+    .toggle-arrow {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      transition: transform 0.4s ease;
+    }
+    .toggle-arrow polyline {
+      stroke: var(--mid-grey);
+      stroke-width: 1.5;
+      fill: none;
+      transition: stroke 0.3s;
+    }
+    .toggle-btn.open .toggle-arrow { transform: rotate(180deg); }
+    .toggle-btn.open .toggle-arrow polyline { stroke: rgba(255,255,255,0.5); }
+
+    /* CTA */
+    .cta-section {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ar-btn {
+      width: 100%;
+      padding: 17px 24px;
+      background: var(--dark);
+      border: none;
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background 0.25s;
+    }
+    .ar-btn:hover { background: var(--accent); }
+    .ar-btn svg {
+      width: 16px; height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+      opacity: 0.7;
+    }
+
+    .enquire-btn {
+      width: 100%;
+      padding: 15px 24px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .enquire-btn:hover { border-color: var(--dark); color: var(--dark); }
+
+    .ar-note {
+      font-size: 0.57rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--mid-grey);
+      text-align: center;
+    }
+
+    /* Mobile */
+    @media (max-width: 860px) {
+      .main { grid-template-columns: 1fr; }
+      .sidebar { border-left: none; border-top: 1px solid var(--border); }
+      header { padding: 18px 20px; }
+      .header-nav { display: none; }
+      .breadcrumb { padding: 10px 20px; }
+      .sidebar-inner { padding: 28px 20px; }
+      model-viewer { min-height: 50vh; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Som<span>nus</span></div>
-  <div class="header-tag">3D Product Preview — WebAR Ready</div>
+  <div class="logo">Somnus</div>
+  <ul class="header-nav">
+    <li><a href="#">Products</a></li>
+    <li><a href="#">Finishes</a></li>
+    <li><a href="#">Resources</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <a href="#" class="header-cta">Contact Us</a>
 </header>
+
+<div class="breadcrumb">
+  Products <span>/</span> Vanities <span>/</span> SOB-B-500-602
+</div>
 
 <div class="main">
 
-  <!-- ── 3D Viewer ── -->
   <div class="viewer-wrap">
     <div class="loading-overlay" id="loadingOverlay">
-      <div class="loader-ring"></div>
-      <div class="loading-text">Loading Model</div>
+      <div class="loader-bar"></div>
+      <div class="loading-text">Loading 3D Model</div>
     </div>
 
     <model-viewer
       id="cabinetViewer"
       src="testmotion9.glb"
       ios-src="testmotion9.usdz"
-      alt="Somnus bathroom vanity cabinet"
+      alt="Somnus bathroom vanity SOB-B-500-602"
       camera-controls
       auto-rotate
-      auto-rotate-delay="3000"
-      rotation-per-second="12deg"
+      auto-rotate-delay="2000"
+      rotation-per-second="10deg"
       ar
       ar-modes="webxr scene-viewer quick-look"
-      shadow-intensity="1.2"
-      shadow-softness="0.8"
+      shadow-intensity="0.8"
+      shadow-softness="1"
       environment-image="neutral"
-      exposure="0.9"
+      exposure="1.1"
     ></model-viewer>
 
-    <div class="viewer-label">拖动旋转 · 双指缩放</div>
+    <div class="viewer-hint">Drag to rotate &nbsp;·&nbsp; Pinch to zoom</div>
   </div>
 
-  <!-- ── Sidebar ── -->
   <aside class="sidebar">
+    <div class="sidebar-inner">
 
-    <div>
-      <h1 class="product-title">浴室<br>储物柜</h1>
-      <p class="product-sku">SOB-B-500-602 · Florentine Walnut</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Drawer Controls -->
-    <div>
-      <p class="section-label">抽屉控制</p>
-      <div class="drawer-controls">
-
-        <button class="drawer-btn" id="btn0" onclick="toggleDrawer(0)">
-          <div class="btn-icon">
-            <svg class="arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-          <div class="btn-text">
-            <span class="btn-name">上层抽屉</span>
-            <span class="btn-state" id="state0">已关闭</span>
-          </div>
-        </button>
-
-        <button class="drawer-btn" id="btn1" onclick="toggleDrawer(1)">
-          <div class="btn-icon">
-            <svg class="arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-          <div class="btn-text">
-            <span class="btn-name">下层抽屉</span>
-            <span class="btn-state" id="state1">已关闭</span>
-          </div>
-        </button>
-
-        <button class="all-btn" id="allBtn" onclick="toggleAll()">
-          全部展开
-        </button>
-
+      <div>
+        <p class="product-category">Bathroom Vanity</p>
+        <h1 class="product-title">Wall-Hung<br>Cabinet</h1>
+        <p class="product-subtitle">SOB-B-500-602 &nbsp;·&nbsp; Florentine Walnut<br>Brushed Stainless Hardware</p>
       </div>
-    </div>
 
-    <div class="divider"></div>
+      <div class="divider"></div>
 
-    <!-- Specs -->
-    <div>
-      <p class="section-label">产品规格</p>
-      <div class="specs">
-        <div class="spec-row">
-          <span class="spec-key">宽度</span>
-          <span class="spec-val">500 mm</span>
-        </div>
-        <div class="spec-row">
-          <span class="spec-key">高度</span>
-          <span class="spec-val">602 mm</span>
-        </div>
-        <div class="spec-row">
-          <span class="spec-key">饰面</span>
-          <span class="spec-val">Florentine Walnut</span>
-        </div>
-        <div class="spec-row">
-          <span class="spec-key">五金</span>
-          <span class="spec-val">Brushed Stainless</span>
+      <div>
+        <p class="section-title">Specifications</p>
+        <div class="specs">
+          <div class="spec-row">
+            <span class="spec-key">Width</span>
+            <span class="spec-val">500 mm</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Height</span>
+            <span class="spec-val">602 mm</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Depth</span>
+            <span class="spec-val">460 mm</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Finish</span>
+            <span class="spec-val">Florentine Walnut</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Hardware</span>
+            <span class="spec-val">Brushed Stainless</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Drawers</span>
+            <span class="spec-val">2 Soft-Close</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- AR Button -->
-    <div class="ar-section">
-      <button class="ar-btn" onclick="launchAR()">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        在你的空间中查看
-      </button>
-      <p class="ar-note">需要 iOS Safari 或 Android Chrome</p>
-    </div>
+      <div class="divider"></div>
 
+      <div>
+        <p class="section-title">Interactive</p>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDrawers()">
+          <div class="toggle-left">
+            <div class="drawer-icon">
+              <div class="d-line"></div>
+              <div class="d-handle"></div>
+            </div>
+            <div class="toggle-text">
+              <span class="toggle-label" id="toggleLabel">Open Drawers</span>
+              <span class="toggle-sub" id="toggleSub">Click to open</span>
+            </div>
+          </div>
+          <svg class="toggle-arrow" viewBox="0 0 18 18">
+            <polyline points="4 7 9 12 14 7"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="cta-section">
+        <button class="ar-btn" onclick="launchAR()">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          View in Your Space
+        </button>
+        <button class="enquire-btn">Enquire Now</button>
+        <p class="ar-note">Requires iOS Safari or Android Chrome</p>
+      </div>
+
+    </div>
   </aside>
 </div>
 
 <script>
   const viewer = document.getElementById('cabinetViewer');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const toggleLabel = document.getElementById('toggleLabel');
+  const toggleSub = document.getElementById('toggleSub');
 
-  // ── 动画名称 ── 改成你 GLB 里实际的动画名
-  // 如果两个抽屉是同一个动画：
   const ANIMATION_NAME = 'Drawer_Open_Close';
+  let isOpen = false;
 
-  // 如果两个抽屉是不同动画，在这里分别定义：
-  // const ANIMATIONS = ['Drawer_Top_Open', 'Drawer_Bottom_Open'];
-
-  const drawerStates = [false, false]; // false = 关闭
-  let allOpen = false;
-
-  // 隐藏加载覆盖层
   viewer.addEventListener('load', () => {
     document.getElementById('loadingOverlay').classList.add('hidden');
-    console.log('可用动画：', viewer.availableAnimations);
+    console.log('Available animations:', viewer.availableAnimations);
   });
 
-  function toggleDrawer(index) {
-    drawerStates[index] = !drawerStates[index];
-    const isOpen = drawerStates[index];
-
-    const btn = document.getElementById(`btn${index}`);
-    const stateEl = document.getElementById(`state${index}`);
-
-    btn.classList.toggle('active', isOpen);
-    stateEl.textContent = isOpen ? '已打开' : '已关闭';
-
-    // 播放动画
+  function toggleDrawers() {
+    isOpen = !isOpen;
     viewer.animationName = ANIMATION_NAME;
-    viewer.play({ repetitions: 1 });
 
-    // 更新全部按钮文字
-    updateAllBtn();
-  }
-
-  function toggleAll() {
-    allOpen = !allOpen;
-    drawerStates[0] = allOpen;
-    drawerStates[1] = allOpen;
-
-    [0, 1].forEach(i => {
-      document.getElementById(`btn${i}`).classList.toggle('active', allOpen);
-      document.getElementById(`state${i}`).textContent = allOpen ? '已打开' : '已关闭';
-    });
-
-    viewer.animationName = ANIMATION_NAME;
-    viewer.play({ repetitions: 1 });
-
-    updateAllBtn();
-  }
-
-  function updateAllBtn() {
-    const anyOpen = drawerStates.some(s => s);
-    document.getElementById('allBtn').textContent = anyOpen ? '全部关闭' : '全部展开';
+    if (isOpen) {
+      viewer.timeScale = 1;
+      viewer.play({ repetitions: 1 });
+      toggleBtn.classList.add('open');
+      toggleLabel.textContent = 'Close Drawers';
+      toggleSub.textContent = 'Click to close';
+    } else {
+      viewer.timeScale = -1;
+      viewer.play({ repetitions: 1 });
+      toggleBtn.classList.remove('open');
+      toggleLabel.textContent = 'Open Drawers';
+      toggleSub.textContent = 'Click to open';
+    }
   }
 
   function launchAR() {
-    // 触发 model-viewer 内置 AR
     viewer.activateAR();
   }
 </script>
