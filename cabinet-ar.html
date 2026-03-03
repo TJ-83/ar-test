@@ -9,6 +9,25 @@
     <style>
       body { margin: 0; overflow: hidden; }
     </style>
+    <script>
+      AFRAME.registerComponent('play-animation-on-load', {
+        init: function () {
+          var model = this.el;
+          model.addEventListener('model-loaded', function () {
+            var mixer = model.components['animation-mixer'];
+            if (mixer) {
+              mixer.play();
+            } else {
+              model.setAttribute('animation-mixer', {
+                clip: 'Drawer_Open_Close',
+                loop: 'repeat',
+                timeScale: 1
+              });
+            }
+          });
+        }
+      });
+    </script>
   </head>
   <body>
     <a-scene
@@ -31,10 +50,10 @@
           scale="0.5 0.5 0.5"
           rotation="0 0 0"
           animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"
+          play-animation-on-load
         ></a-gltf-model>
       </a-entity>
 
     </a-scene>
   </body>
 </html>
-
