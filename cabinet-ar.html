@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cabinet AR</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
+      body { margin: 0; overflow: hidden; }
     </style>
-</head>
+  </head>
+  <body>
+    <a-scene
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;"
+      color-space="sRGB"
+      renderer="colorManagement: true"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-assets>
+        <a-asset-item id="cabinet" src="./testmotion9.glb"></a-asset-item>
+      </a-assets>
 
-<body>
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;" color-space="sRGB"
-        renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-        <a-assets>
-            <a-asset-item id="cabinet" src="./testmotion9.glb"></a-asset-item>
-        </a-assets>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-        <a-entity mindar-image-target="targetIndex: 0">
-            <a-gltf-model src="#cabinet" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0"
-                animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"></a-gltf-model>
-        </a-entity>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-gltf-model
+          src="#cabinet"
+          position="0 0 0"
+          scale="0.5 0.5 0.5"
+          rotation="0 0 0"
+          animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"
+        ></a-gltf-model>
+      </a-entity>
 
     </a-scene>
-</body>
-
-
+  </body>
 </html>
+
