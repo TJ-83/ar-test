@@ -2,28 +2,51 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cabinet Animation Test</title>
+    <title>Cabinet AR</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      body { margin: 0; }
+      body { margin: 0; overflow: hidden; }
     </style>
+    <script>
+      AFRAME.registerComponent('cabinet-animation', {
+        init: function () {
+          var el = this.el;
+
+          el.addEventListener('model-loaded', function () {
+            console.log('model loaded, setting animation');
+            el.setAttribute('animation-mixer', 
+              'clip: Drawer_Open_Close; loop: repeat; timeScale: 1');
+          });
+        }
+      });
+    </script>
   </head>
   <body>
-    <a-scene>
+    <a-scene
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;"
+      color-space="sRGB"
+      renderer="colorManagement: true"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
       <a-assets timeout="10000">
         <a-asset-item id="cabinet" src="./testmotion9.glb"></a-asset-item>
       </a-assets>
 
-      <a-gltf-model
-        src="#cabinet"
-        position="0 0 -2"
-        scale="0.5 0.5 0.5"
-        animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"
-      ></a-gltf-model>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-camera position="0 0 0"></a-camera>
-      <a-sky color="#CCCCCC"></a-sky>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-gltf-model
+          src="#cabinet"
+          position="0 0 0"
+          scale="0.5 0.5 0.5"
+          rotation="0 0 0"
+          cabinet-animation
+        ></a-gltf-model>
+      </a-entity>
+
     </a-scene>
   </body>
 </html>
