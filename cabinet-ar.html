@@ -2,62 +2,28 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cabinet AR</title>
+    <title>Cabinet Animation Test</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
+      body { margin: 0; }
     </style>
-    <script>
-      AFRAME.registerComponent('start-animation-on-target', {
-        init: function () {
-          var el = this.el;
-          var targetEl = el.closest('[mindar-image-target]');
-          
-          targetEl.addEventListener('targetFound', function () {
-            console.log('Target found - starting animation');
-            setTimeout(function() {
-              el.setAttribute('animation-mixer', {
-                clip: 'Drawer_Open_Close',
-                loop: 'repeat',
-                timeScale: 1,
-                crossFadeDuration: 0
-              });
-            }, 500);
-          });
-
-          targetEl.addEventListener('targetLost', function () {
-            el.removeAttribute('animation-mixer');
-          });
-        }
-      });
-    </script>
   </head>
   <body>
-    <a-scene
-      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;"
-      color-space="sRGB"
-      renderer="colorManagement: true"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false"
-    >
+    <a-scene>
       <a-assets timeout="10000">
         <a-asset-item id="cabinet" src="./testmotion9.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-gltf-model
+        src="#cabinet"
+        position="0 0 -2"
+        scale="0.5 0.5 0.5"
+        animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"
+      ></a-gltf-model>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model
-          src="#cabinet"
-          position="0 0 0"
-          scale="0.5 0.5 0.5"
-          rotation="0 0 0"
-          start-animation-on-target
-        ></a-gltf-model>
-      </a-entity>
-
+      <a-camera position="0 0 0"></a-camera>
+      <a-sky color="#CCCCCC"></a-sky>
     </a-scene>
   </body>
 </html>
