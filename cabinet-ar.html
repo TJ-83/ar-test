@@ -13,10 +13,8 @@
       AFRAME.registerComponent('cabinet-animation', {
         init: function () {
           var el = this.el;
-
           el.addEventListener('model-loaded', function () {
-            console.log('model loaded, setting animation');
-            el.setAttribute('animation-mixer', 
+            el.setAttribute('animation-mixer',
               'clip: Drawer_Open_Close; loop: repeat; timeScale: 1');
           });
         }
@@ -25,7 +23,12 @@
   </head>
   <body>
     <a-scene
-      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;"
+      mindar-image="imageTargetSrc: ./targets.mind; 
+                    autoStart: true;
+                    filterMinCF: 0.001;
+                    filterBeta: 0.01;
+                    missTolerance: 5;
+                    warmupTolerance: 5;"
       color-space="sRGB"
       renderer="colorManagement: true"
       vr-mode-ui="enabled: false"
@@ -50,3 +53,13 @@
     </a-scene>
   </body>
 </html>
+```
+
+---
+
+## 关键参数说明
+```
+filterMinCF: 0.001   ← 最小截止频率，越小越平滑
+filterBeta: 0.01     ← 速度系数，越小抖动越少
+missTolerance: 5     ← 丢失目标前等待帧数，防止闪烁
+warmupTolerance: 5   ← 检测到目标后稳定帧数再显示
