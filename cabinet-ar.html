@@ -10,20 +10,25 @@
       body { margin: 0; overflow: hidden; }
     </style>
     <script>
-      AFRAME.registerComponent('play-animation-on-load', {
+      AFRAME.registerComponent('start-animation-on-target', {
         init: function () {
-          var model = this.el;
-          model.addEventListener('model-loaded', function () {
-            var mixer = model.components['animation-mixer'];
-            if (mixer) {
-              mixer.play();
-            } else {
-              model.setAttribute('animation-mixer', {
+          var el = this.el;
+          var targetEl = el.closest('[mindar-image-target]');
+          
+          targetEl.addEventListener('targetFound', function () {
+            console.log('Target found - starting animation');
+            setTimeout(function() {
+              el.setAttribute('animation-mixer', {
                 clip: 'Drawer_Open_Close',
                 loop: 'repeat',
-                timeScale: 1
+                timeScale: 1,
+                crossFadeDuration: 0
               });
-            }
+            }, 500);
+          });
+
+          targetEl.addEventListener('targetLost', function () {
+            el.removeAttribute('animation-mixer');
           });
         }
       });
@@ -37,7 +42,7 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
-      <a-assets>
+      <a-assets timeout="10000">
         <a-asset-item id="cabinet" src="./testmotion9.glb"></a-asset-item>
       </a-assets>
 
@@ -49,8 +54,7 @@
           position="0 0 0"
           scale="0.5 0.5 0.5"
           rotation="0 0 0"
-          animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"
-          play-animation-on-load
+          start-animation-on-target
         ></a-gltf-model>
       </a-entity>
 
