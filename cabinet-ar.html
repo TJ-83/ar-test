@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
+      body { margin: 0; overflow: hidden; background: #000; }
       #lock-btn {
         position: fixed;
         bottom: 40px;
@@ -25,6 +25,43 @@
         cursor: pointer;
         white-space: nowrap;
       }
+      #viewer-container {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #111;
+        z-index: 998;
+      }
+      #back-btn {
+        position: fixed;
+        top: 40px;
+        left: 20px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        border: 2px solid white;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        z-index: 1000;
+        display: none;
+        cursor: pointer;
+      }
+      #hint {
+        position: fixed;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.5);
+        color: white;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        z-index: 1000;
+        display: none;
+        white-space: nowrap;
+      }
     </style>
     <script>
       AFRAME.registerComponent('cabinet-animation', {
@@ -39,7 +76,10 @@
     </script>
   </head>
   <body>
+
+    <!-- AR场景 -->
     <a-scene
+      id="ar-scene"
       mindar-image="imageTargetSrc: ./targets.mind;
                     autoStart: true;
                     filterMinCF: 0.001;
@@ -54,88 +94,144 @@
       <a-assets timeout="10000">
         <a-asset-item id="cabinet" src="./testmotion9.glb"></a-asset-item>
       </a-assets>
-
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
       <a-entity id="tracked-target" mindar-image-target="targetIndex: 0">
         <a-gltf-model
           id="cabinet-model"
           src="#cabinet"
           position="0 0.3 0"
           scale="2.36 2.36 2.36"
-          rotation="90 180 0"
+          rotation="90 0 0"
           cabinet-animation
         ></a-gltf-model>
       </a-entity>
-
     </a-scene>
 
-    <button id="lock-btn">🔒 Lock Model - Free Look</button>
+    <button id="lock-btn">🔒 Lock Model — Free Look</button>
+
+    <!-- 锁定后的3D查看器 -->
+    <div id="viewer-container">
+      <a-scene
+        id="viewer-scene"
+        embedded
+        style="width:100%;height:100%;"
+        color-space="sRGB"
+        renderer="colorManagement: true"
+        vr-mode-ui="enabled: false"
+      >
+        <a-assets>
+          <a-asset-item id="cabinet2" src="./testmotion9.glb"></a-asset-item>
+        </a-assets>
+        <a-entity id="viewer-model"
+          gltf-model="#cabinet2"
+          position="0 0 -2"
+          scale="0.8 0.8 0.8"
+          rotation="90 0 0"
+          animation-mixer="clip: Drawer_Open_Close; loop: repeat; timeScale: 1"
+        ></a-entity>
+        <a-camera
+          id="viewer-camera"
+          position="0 0 0"
+          look-controls="enabled: false"
+          wasd-controls="enabled: false"
+        ></a-camera>
+        <a-light type="ambient" intensity="1.5"></a-light>
+        <a-light type="directional" position="1 2 1" intensity="1"></a-light>
+      </a-scene>
+    </div>
+
+    <button id="back-btn">← Back to AR</button>
+    <div id="hint">Drag to rotate</div>
 
     <script>
-      var locked = false;
       var lockBtn = document.getElementById('lock-btn');
       var trackedTarget = document.getElementById('tracked-target');
-      var cabinetModel = document.getElementById('cabinet-model');
-      var scene = document.querySelector('a-scene');
+      var viewerContainer = document.getElementById('viewer-container');
+      var arScene = document.getElementById('ar-scene');
+      var backBtn = document.getElementById('back-btn');
+      var hint = document.getElementById('hint');
+      var locked = false;
 
       trackedTarget.addEventListener('targetFound', function () {
         if (!locked) lockBtn.style.display = 'block';
       });
-
       trackedTarget.addEventListener('targetLost', function () {
         if (!locked) lockBtn.style.display = 'none';
       });
 
       lockBtn.addEventListener('click', function () {
-        if (locked) return;
         locked = true;
         lockBtn.style.display = 'none';
 
-        // 记录世界坐标
-        var worldPos = new THREE.Vector3();
-        var worldQuat = new THREE.Quaternion();
-        var worldScale = new THREE.Vector3();
-        cabinetModel.object3D.getWorldPosition(worldPos);
-        cabinetModel.object3D.getWorldQuaternion(worldQuat);
-        cabinetModel.object3D.getWorldScale(worldScale);
-
-        // 移到场景根节点
-        trackedTarget.removeChild(cabinetModel);
-        scene.appendChild(cabinetModel);
-
-        // 应用世界坐标
-        cabinetModel.object3D.position.copy(worldPos);
-        cabinetModel.object3D.quaternion.copy(worldQuat);
-        cabinetModel.object3D.scale.copy(worldScale);
-        cabinetModel.object3D.visible = true;
-
-        // 停止MindAR追踪
-        var mindARSystem = scene.systems['mindar-image-system'];
+        // 停止AR摄像头
+        var mindARSystem = arScene.systems['mindar-image-system'];
         if (mindARSystem) mindARSystem.pause();
+        arScene.style.display = 'none';
 
-        // iOS需要用户手势触发陀螺仪权限
-        if (typeof DeviceOrientationEvent !== 'undefined' &&
-            typeof DeviceOrientationEvent.requestPermission === 'function') {
-          DeviceOrientationEvent.requestPermission().then(function(state) {
-            if (state === 'granted') {
-              enableLookControls();
-            }
-          }).catch(console.error);
-        } else {
-          // Android直接启用
-          enableLookControls();
-        }
+        // 显示3D查看器
+        viewerContainer.style.display = 'block';
+        backBtn.style.display = 'block';
+        hint.style.display = 'block';
+
+        // 等viewer加载完再初始化拖拽
+        setTimeout(initDrag, 1000);
       });
 
-      function enableLookControls() {
-        var camera = document.querySelector('a-camera');
-        camera.setAttribute('look-controls', {
-          enabled: true,
-          magicWindowTrackingEnabled: true,
-          pointerLockEnabled: false
+      backBtn.addEventListener('click', function () {
+        locked = false;
+        viewerContainer.style.display = 'none';
+        backBtn.style.display = 'none';
+        hint.style.display = 'none';
+        arScene.style.display = 'block';
+        var mindARSystem = arScene.systems['mindar-image-system'];
+        if (mindARSystem) mindARSystem.play();
+      });
+
+      // 手指拖动旋转
+      function initDrag() {
+        var viewerModel = document.getElementById('viewer-model');
+        var isDragging = false;
+        var lastX = 0;
+        var lastY = 0;
+        var rotY = 0;
+        var rotX = 90; // 匹配初始rotation
+
+        document.addEventListener('touchstart', function(e) {
+          isDragging = true;
+          lastX = e.touches[0].clientX;
+          lastY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          e.preventDefault();
+          var dx = e.touches[0].clientX - lastX;
+          var dy = e.touches[0].clientY - lastY;
+          lastX = e.touches[0].clientX;
+          lastY = e.touches[0].clientY;
+          rotY += dx * 0.5;
+          rotX += dy * 0.3;
+          // 限制X轴旋转避免翻转
+          rotX = Math.max(60, Math.min(120, rotX));
+          if (viewerModel) {
+            viewerModel.setAttribute('rotation', rotX + ' ' + rotY + ' 0');
+          }
+        }, { passive: false });
+
+        document.addEventListener('touchend', function() {
+          isDragging = false;
         });
       }
     </script>
   </body>
 </html>
+```
+
+---
+
+## 新的使用流程
+```
+1. 扫触发图 → AR柜子出现（原来的体验）
+2. 点 Lock Model → 切换到黑色背景3D查看器
+3. 用手指拖动 → 柜子旋转，360度查看
+4. 点 Back to AR → 回到AR模式重新扫
