@@ -42,13 +42,13 @@
       }
       #back-btn {
         position: fixed;
-        top: 50px;
+        bottom: 40px;
         left: 20px;
         background: rgba(0,0,0,0.6);
         color: white;
         border: 2px solid white;
         border-radius: 20px;
-        padding: 10px 20px;
+        padding: 12px 20px;
         font-size: 14px;
         font-family: Arial, sans-serif;
         z-index: 999;
@@ -64,6 +64,27 @@
             el.setAttribute('animation-mixer',
               'clip: Drawer_Open_Close; loop: repeat; timeScale: 1');
           });
+        }
+      });
+
+      AFRAME.registerComponent('drag-rotate', {
+        init: function () {
+          this.isDragging = false;
+          this.lastX = 0;
+          this.lastY = 0;
+          this.rotY = 0;
+          this.rotX = 0;
+          this.active = false;
+        },
+        activate: function () {
+          this.active = true;
+          // 从当前rotation初始化
+          var rot = this.el.getAttribute('rotation');
+          this.rotX = rot.x;
+          this.rotY = rot.y;
+        },
+        tick: function () {
+          if (!this.active) return;
         }
       });
     </script>
@@ -94,7 +115,7 @@
           src="#cabinet"
           position="0 0.3 0"
           scale="2.36 2.36 2.36"
-          rotation="90 0 0"
+          rotation="0 0 0"
           cabinet-animation
         ></a-gltf-model>
       </a-entity>
@@ -102,8 +123,8 @@
     </a-scene>
 
     <button id="lock-btn">🔒 Lock Model — Free Look</button>
-    <div id="hint">Drag to rotate</div>
-    <button id="back-btn">← Scan Again</button>
+    <div id="hint">✋ Drag to rotate</div>
+    <button id="back-btn">↺ Scan Again</button>
 
     <script>
       var locked = false;
@@ -117,7 +138,6 @@
       trackedTarget.addEventListener('targetFound', function () {
         if (!locked) lockBtn.style.display = 'block';
       });
-
       trackedTarget.addEventListener('targetLost', function () {
         if (!locked) lockBtn.style.display = 'none';
       });
@@ -126,35 +146,22 @@
         locked = true;
         lockBtn.style.display = 'none';
 
-        // 获取模型当前世界坐标
-        var worldPos = new THREE.Vector3();
-        var worldQuat = new THREE.Quaternion();
-        var worldScale = new THREE.Vector3();
-        cabinetModel.object3D.getWorldPosition(worldPos);
-        cabinetModel.object3D.getWorldQuaternion(worldQuat);
-        cabinetModel.object3D.getWorldScale(worldScale);
-
-        // 把模型移到场景根节点（脱离追踪锚点）
-        trackedTarget.removeChild(cabinetModel);
-        scene.appendChild(cabinetModel);
-        cabinetModel.object3D.position.copy(worldPos);
-        cabinetModel.object3D.quaternion.copy(worldQuat);
-        cabinetModel.object3D.scale.copy(worldScale);
-        cabinetModel.object3D.visible = true;
-
-        // 停止MindAR追踪但保留摄像头画面
+        // 停止MindAR追踪
         var mindARSystem = scene.systems['mindar-image-system'];
         if (mindARSystem) mindARSystem.pause();
+
+        // 隐藏追踪容器但保留模型可见
+        // 把模型position固定在摄像头前方
+        cabinetModel.setAttribute('position', '0 0 -2');
+        cabinetModel.setAttribute('scale', '0.8 0.8 0.8');
 
         hint.style.display = 'block';
         backBtn.style.display = 'block';
 
-        // 启动拖动旋转
         initDrag();
       });
 
       backBtn.addEventListener('click', function () {
-        // 重新加载页面回到AR扫描状态
         window.location.reload();
       });
 
@@ -162,13 +169,17 @@
         var isDragging = false;
         var lastX = 0;
         var lastY = 0;
-        var currentRotY = 0;
-        var currentRotX = 90;
+        var rotX = 0;
+        var rotY = 0;
+
+        // 从当前rotation读取初始值
+        var currentRot = cabinetModel.getAttribute('rotation');
+        rotX = currentRot.x;
+        rotY = currentRot.y;
 
         var canvas = scene.canvas;
 
         canvas.addEventListener('touchstart', function(e) {
-          if (!locked) return;
           isDragging = true;
           lastX = e.touches[0].clientX;
           lastY = e.touches[0].clientY;
@@ -176,20 +187,15 @@
         }, { passive: false });
 
         canvas.addEventListener('touchmove', function(e) {
-          if (!isDragging || !locked) return;
+          if (!isDragging) return;
           e.preventDefault();
           var dx = e.touches[0].clientX - lastX;
           var dy = e.touches[0].clientY - lastY;
           lastX = e.touches[0].clientX;
           lastY = e.touches[0].clientY;
-          currentRotY += dx * 0.5;
-          currentRotX += dy * 0.3;
-          currentRotX = Math.max(0, Math.min(180, currentRotX));
-          cabinetModel.object3D.rotation.set(
-            THREE.MathUtils.degToRad(currentRotX),
-            THREE.MathUtils.degToRad(currentRotY),
-            0
-          );
+          rotY += dx * 0.5;
+          rotX += dy * 0.3;
+          cabinetModel.setAttribute('rotation', {x: rotX, y: rotY, z: 0});
         }, { passive: false });
 
         canvas.addEventListener('touchend', function() {
