@@ -66,27 +66,6 @@
           });
         }
       });
-
-      AFRAME.registerComponent('drag-rotate', {
-        init: function () {
-          this.isDragging = false;
-          this.lastX = 0;
-          this.lastY = 0;
-          this.rotY = 0;
-          this.rotX = 0;
-          this.active = false;
-        },
-        activate: function () {
-          this.active = true;
-          // 从当前rotation初始化
-          var rot = this.el.getAttribute('rotation');
-          this.rotX = rot.x;
-          this.rotY = rot.y;
-        },
-        tick: function () {
-          if (!this.active) return;
-        }
-      });
     </script>
   </head>
   <body>
@@ -150,39 +129,31 @@
         var mindARSystem = scene.systems['mindar-image-system'];
         if (mindARSystem) mindARSystem.pause();
 
-        // 隐藏追踪容器但保留模型可见
-        // 把模型position固定在摄像头前方
-        // 获取摄像头当前位置和朝向，把模型放在摄像头正前方
-        var camera = document.querySelector('a-camera');
-        var cameraEl = camera.object3D;
-        var direction = new THREE.Vector3(0, 0, -3);
-        direction.applyQuaternion(cameraEl.quaternion);
-        direction.add(cameraEl.position);
-        cabinetModel.object3D.position.copy(direction);
-        cabinetModel.object3D.position.y -= 0.5;
-        cabinetModel.setAttribute('scale', '2 2 2');
+        // 用attach()把模型移到场景根节点
+        // 自动保持模型当前世界坐标不变
+        scene.object3D.attach(cabinetModel.object3D);
 
         hint.style.display = 'block';
         backBtn.style.display = 'block';
 
-        initDrag();
+        // 初始化拖动旋转，读取当前rotation作为起点
+        var euler = cabinetModel.object3D.rotation;
+        initDrag(
+          THREE.MathUtils.radToDeg(euler.x),
+          THREE.MathUtils.radToDeg(euler.y)
+        );
       });
 
       backBtn.addEventListener('click', function () {
         window.location.reload();
       });
 
-      function initDrag() {
+      function initDrag(startRotX, startRotY) {
         var isDragging = false;
         var lastX = 0;
         var lastY = 0;
-        var rotX = 0;
-        var rotY = 0;
-
-        // 从当前rotation读取初始值
-        var currentRot = cabinetModel.getAttribute('rotation');
-        rotX = currentRot.x;
-        rotY = currentRot.y;
+        var rotX = startRotX || 0;
+        var rotY = startRotY || 0;
 
         var canvas = scene.canvas;
 
@@ -202,7 +173,11 @@
           lastY = e.touches[0].clientY;
           rotY += dx * 0.5;
           rotX += dy * 0.3;
-          cabinetModel.setAttribute('rotation', {x: rotX, y: rotY, z: 0});
+          cabinetModel.object3D.rotation.set(
+            THREE.MathUtils.degToRad(rotX),
+            THREE.MathUtils.degToRad(rotY),
+            0
+          );
         }, { passive: false });
 
         canvas.addEventListener('touchend', function() {
@@ -212,6 +187,3 @@
     </script>
   </body>
 </html>
-
-
-
