@@ -132,6 +132,7 @@
         // 用attach()把模型移到场景根节点
         // 自动保持模型当前世界坐标不变
         scene.object3D.attach(cabinetModel.object3D);
+        cabinetModel.object3D.position.set(0, 0, -3);
 
         hint.style.display = 'block';
         backBtn.style.display = 'block';
@@ -187,3 +188,4 @@
     </script>
   </body>
 </html>
+
