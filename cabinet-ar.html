@@ -152,7 +152,14 @@
 
         // 隐藏追踪容器但保留模型可见
         // 把模型position固定在摄像头前方
-        cabinetModel.setAttribute('position', '0 0 -3');
+        // 获取摄像头当前位置和朝向，把模型放在摄像头正前方
+        var camera = document.querySelector('a-camera');
+        var cameraEl = camera.object3D;
+        var direction = new THREE.Vector3(0, 0, -3);
+        direction.applyQuaternion(cameraEl.quaternion);
+        direction.add(cameraEl.position);
+        cabinetModel.object3D.position.copy(direction);
+        cabinetModel.object3D.position.y -= 0.5;
         cabinetModel.setAttribute('scale', '2 2 2');
 
         hint.style.display = 'block';
@@ -205,5 +212,6 @@
     </script>
   </body>
 </html>
+
 
 
