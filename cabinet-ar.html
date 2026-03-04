@@ -23,6 +23,7 @@
         z-index: 999;
         display: none;
         cursor: pointer;
+        white-space: nowrap;
       }
     </style>
     <script>
@@ -56,21 +57,20 @@
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- 追踪锚点：跟着触发图移动 -->
       <a-entity id="tracked-target" mindar-image-target="targetIndex: 0">
         <a-gltf-model
           id="cabinet-model"
           src="#cabinet"
           position="0 0.3 0"
           scale="2.36 2.36 2.36"
-          rotation="-90 180 0"
+          rotation="90 180 0"
           cabinet-animation
         ></a-gltf-model>
       </a-entity>
 
     </a-scene>
 
-    <button id="lock-btn">🔒 锁定位置 — 自由查看</button>
+    <button id="lock-btn">🔒 Lock Model - Free Look</button>
 
     <script>
       var locked = false;
@@ -79,26 +79,20 @@
       var cabinetModel = document.getElementById('cabinet-model');
       var scene = document.querySelector('a-scene');
 
-      // 当目标被找到，显示锁定按钮
       trackedTarget.addEventListener('targetFound', function () {
-        if (!locked) {
-          lockBtn.style.display = 'block';
-        }
+        if (!locked) lockBtn.style.display = 'block';
       });
 
       trackedTarget.addEventListener('targetLost', function () {
-        if (!locked) {
-          lockBtn.style.display = 'none';
-        }
+        if (!locked) lockBtn.style.display = 'none';
       });
 
-      // 点击锁定：把模型从追踪锚点移到场景根节点
       lockBtn.addEventListener('click', function () {
         if (locked) return;
         locked = true;
         lockBtn.style.display = 'none';
 
-        // 获取模型当前世界坐标和旋转
+        // 记录世界坐标
         var worldPos = new THREE.Vector3();
         var worldQuat = new THREE.Quaternion();
         var worldScale = new THREE.Vector3();
@@ -106,37 +100,42 @@
         cabinetModel.object3D.getWorldQuaternion(worldQuat);
         cabinetModel.object3D.getWorldScale(worldScale);
 
-        // 从追踪节点里移除模型
+        // 移到场景根节点
         trackedTarget.removeChild(cabinetModel);
-
-        // 添加到场景根节点
         scene.appendChild(cabinetModel);
 
-        // 应用之前记录的世界坐标
+        // 应用世界坐标
         cabinetModel.object3D.position.copy(worldPos);
         cabinetModel.object3D.quaternion.copy(worldQuat);
         cabinetModel.object3D.scale.copy(worldScale);
+        cabinetModel.object3D.visible = true;
 
-        // 停止MindAR追踪（节省性能）
+        // 停止MindAR追踪
         var mindARSystem = scene.systems['mindar-image-system'];
         if (mindARSystem) mindARSystem.pause();
 
-        // 开启陀螺仪让用户绕模型走动
-        var camera = document.querySelector('a-camera');
-        camera.setAttribute('look-controls', 'enabled: true');
+        // iOS需要用户手势触发陀螺仪权限
+        if (typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then(function(state) {
+            if (state === 'granted') {
+              enableLookControls();
+            }
+          }).catch(console.error);
+        } else {
+          // Android直接启用
+          enableLookControls();
+        }
       });
+
+      function enableLookControls() {
+        var camera = document.querySelector('a-camera');
+        camera.setAttribute('look-controls', {
+          enabled: true,
+          magicWindowTrackingEnabled: true,
+          pointerLockEnabled: false
+        });
+      }
     </script>
   </body>
 </html>
-```
-
----
-
-## 使用流程
-```
-1. 打开页面，对准触发图
-2. 柜子出现，动画播放
-3. 屏幕底部出现「🔒 锁定位置」按钮
-4. 点击按钮
-5. 放下触发图，柜子留在原位
-6. 手机绕着柜子走动，从任意角度查看
