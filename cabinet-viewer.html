@@ -50,11 +50,15 @@
     }
 
     .logo {
-      font-family: 'Playfair Display', serif;
-      font-weight: 400;
-      font-size: 1.5rem;
-      letter-spacing: 0.08em;
-      color: var(--dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 32px;
+      /* Set a reasonable height for the image logo */
+      width: auto;
+      object-fit: contain;
     }
 
     .header-nav {
@@ -64,17 +68,17 @@
     }
 
     .header-nav a {
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: var(--text);
+      color: var(--dark);
       text-decoration: none;
-      opacity: 0.7;
-      transition: opacity 0.2s;
+      transition: color 0.2s;
     }
 
     .header-nav a:hover {
-      opacity: 1;
+      color: var(--accent);
     }
 
     .header-cta {
@@ -108,9 +112,9 @@
     /* Main Layout */
     .main {
       display: grid;
-      grid-template-columns: minmax(auto, 1fr) 400px;
+      grid-template-columns: minmax(auto, 60%) 40%;
+      /* 60/40 Split */
       min-height: calc(100vh - 121px);
-      gap: 40px;
     }
 
     /* Left Side: Viewer & Actions */
@@ -126,12 +130,10 @@
     .viewer-wrap {
       position: relative;
       background: #f7f7f7;
-      /* Very light gray comparable to Herman Miller */
       border-radius: 4px;
-      /* Optional subtle rounding */
       width: 100%;
-      max-width: 800px;
-      /* Constrain max width so it doesn't blow up on huge screens */
+      max-width: 950px;
+      /* Let it grow much larger to fill its 60% grid space */
       aspect-ratio: 4 / 3;
       /* Fix an aspect ratio like a product photo */
       max-height: 70vh;
@@ -322,29 +324,106 @@
       margin-bottom: 18px;
     }
 
-    /* Specs */
-    .specs {
+    /* Specs -> Configuration Accordion */
+    .config-accordion {
       display: flex;
       flex-direction: column;
+      border-top: 1px solid var(--border);
     }
 
-    .spec-row {
+    .config-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .config-header {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: baseline;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--warm-grey);
+      padding: 16px 0;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
     }
 
-    .spec-row:first-child {
-      border-top: 1px solid var(--warm-grey);
+    .config-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .spec-key {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--mid-grey);
+    .config-num {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--dark);
+      width: 16px;
+    }
+
+    .config-title {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--dark);
+      letter-spacing: 0.02em;
+    }
+
+    .config-header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .config-value {
+      font-size: 0.75rem;
+      color: var(--dark);
+      font-weight: 400;
+    }
+
+    .config-chevron {
+      width: 12px;
+      height: 12px;
+      transition: transform 0.3s ease;
+      fill: var(--dark);
+    }
+
+    .config-item.active .config-chevron {
+      transform: rotate(180deg);
+    }
+
+    .config-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+      background: var(--white);
+    }
+
+    .config-item.active .config-content {
+      max-height: 600px;
+      /* Arbitrary large height to allow expansion */
+      padding-bottom: 24px;
+    }
+
+    /* Minimal swatches for visual placeholders */
+    .swatch-grid {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .swatch {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .swatch:hover,
+    .swatch.selected {
+      border-color: var(--dark);
+      border-width: 2px;
     }
 
     .spec-val {
@@ -691,7 +770,9 @@
   </div>
 
   <header>
-    <div class="logo">Timberline</div>
+    <a href="#" class="logo" aria-label="Timberline Home">
+      <img src="assets/Logo Files/Timberline_Logo_Black.png" alt="Timberline Logo">
+    </a>
     <ul class="header-nav">
       <li><a href="#">Products</a></li>
       <li><a href="#">Finishes</a></li>
@@ -784,43 +865,164 @@
         <div class="divider"></div>
 
         <div>
-          <p class="section-title">Specifications</p>
-          <div class="specs">
-            <div class="spec-row">
-              <span class="spec-key">Width</span>
-              <span class="spec-val">500 mm</span>
+          <!-- Accordion Configuration Menu -->
+          <div class="config-accordion" id="configMenu">
+
+            <!-- Item 1 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">1</span>
+                  <span class="config-title">Mount</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>Wall Hung</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <div class="swatch-grid">
+                  <div class="swatch selected" style="background: #eee;" title="Wall Hung"></div>
+                  <div class="swatch" style="background: #ddd;" title="Floor Standing"></div>
+                </div>
+              </div>
             </div>
-            <div class="spec-row">
-              <span class="spec-key">Height</span>
-              <span class="spec-val">600 mm</span>
+
+            <!-- Item 2 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">2</span>
+                  <span class="config-title">Size</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>500 mm</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <div class="swatch-grid">
+                  <div class="swatch" style="background: #f5f5f5;" title="400 mm"></div>
+                  <div class="swatch selected" style="background: #ebebeb;" title="500 mm"></div>
+                  <div class="swatch" style="background: #e0e0e0;" title="600 mm"></div>
+                </div>
+              </div>
             </div>
-            <div class="spec-row">
-              <span class="spec-key">Depth</span>
-              <span class="spec-val">410 mm</span>
+
+            <!-- Item 3 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">3</span>
+                  <span class="config-title">Cabinet Colour</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>Florentine Walnut</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <div class="swatch-grid">
+                  <div class="swatch selected" style="background: #8B5A2B;" title="Florentine Walnut"></div>
+                  <div class="swatch" style="background: #ffffff;" title="Gloss White"></div>
+                  <div class="swatch" style="background: #1a1a1a;" title="Matte Black"></div>
+                </div>
+              </div>
             </div>
-            <div class="spec-row">
-              <span class="spec-key">Finish</span>
-              <span class="spec-val">Florentine Walnut</span>
+
+            <!-- Item 4 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">4</span>
+                  <span class="config-title">Handle</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>Arch Pull</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <!-- Placeholder content -->
+                <p style="font-size:0.75rem; color:var(--mid-grey); margin-top:10px;">Select handle style options here.
+                </p>
+              </div>
             </div>
-            <div class="spec-row">
-              <span class="spec-key">Hardware</span>
-              <span class="spec-val">Brushed Stainless</span>
+
+            <!-- Item 5 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">5</span>
+                  <span class="config-title">Handle Colour</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>Brushed Stainless</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <div class="swatch-grid">
+                  <div class="swatch selected" style="background: #cccccc;" title="Brushed Stainless"></div>
+                  <div class="swatch" style="background: #d4af37;" title="Brushed Gold"></div>
+                  <div class="swatch" style="background: #222222;" title="Matte Black"></div>
+                </div>
+              </div>
             </div>
-            <div class="spec-row">
-              <span class="spec-key">Drawers</span>
-              <span class="spec-val">2 Soft-Close</span>
+
+            <!-- Item 6 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">6</span>
+                  <span class="config-title">Top</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>SilkSurface</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <p style="font-size:0.75rem; color:var(--mid-grey); margin-top:10px;">Select benchtop material options
+                  here.</p>
+              </div>
             </div>
+
+            <!-- Item 7 -->
+            <div class="config-item">
+              <button class="config-header">
+                <div class="config-header-left">
+                  <span class="config-num">7</span>
+                  <span class="config-title">Top Colour</span>
+                </div>
+                <div class="config-header-right">
+                  <span class="config-value" data-value>Carrara Matte</span>
+                  <svg class="config-chevron" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </button>
+              <div class="config-content">
+                <div class="swatch-grid">
+                  <div class="swatch selected" style="background: #f0f0f0;" title="Carrara Matte"></div>
+                  <div class="swatch" style="background: #e6dfd8;" title="Blanco Marquina"></div>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div>
-          <p class="section-title">Interactive</p>
-        </div>
-
-        <div class="cta-section">
-          <button class="enquire-btn">Enquire Now</button>
         </div>
 
       </div>
@@ -859,6 +1061,30 @@
     const viewer = document.getElementById('cabinetViewer');
     const toggleBtn = document.getElementById('toggleBtn');
     const toggleLabel = document.getElementById('toggleLabel');
+
+    // Accordion Logic
+    const accordionItems = document.querySelectorAll('.config-item');
+
+    accordionItems.forEach(item => {
+      const header = item.querySelector('.config-header');
+      header.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+
+        // Close all other items
+        accordionItems.forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.classList.remove('active');
+          }
+        });
+
+        // Toggle the clicked item
+        if (isActive) {
+          item.classList.remove('active');
+        } else {
+          item.classList.add('active');
+        }
+      });
+    });
     const toggleSub = document.getElementById('toggleSub');
 
     const ANIMATION_NAME = 'Drawer_Open_Close';
