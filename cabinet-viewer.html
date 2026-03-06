@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Somnus — 3D Preview</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400&family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400&family=Raleway:wght@200;300;400;500&display=swap"
+    rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       --white: #ffffff;
@@ -63,7 +72,10 @@
       opacity: 0.7;
       transition: opacity 0.2s;
     }
-    .header-nav a:hover { opacity: 1; }
+
+    .header-nav a:hover {
+      opacity: 1;
+    }
 
     .header-cta {
       font-size: 0.68rem;
@@ -75,7 +87,10 @@
       text-decoration: none;
       transition: background 0.2s;
     }
-    .header-cta:hover { background: var(--accent); }
+
+    .header-cta:hover {
+      background: var(--accent);
+    }
 
     /* Breadcrumb */
     .breadcrumb {
@@ -85,7 +100,10 @@
       color: var(--mid-grey);
       border-bottom: 1px solid var(--border);
     }
-    .breadcrumb span { margin: 0 6px; }
+
+    .breadcrumb span {
+      margin: 0 6px;
+    }
 
     /* Main Layout */
     .main {
@@ -109,7 +127,9 @@
       background-color: transparent;
     }
 
-    model-viewer::part(default-ar-button) { display: none; }
+    model-viewer::part(default-ar-button) {
+      display: none;
+    }
 
     .loading-overlay {
       position: absolute;
@@ -124,7 +144,10 @@
       pointer-events: none;
       z-index: 10;
     }
-    .loading-overlay.hidden { opacity: 0; }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+    }
 
     .loader-bar {
       width: 120px;
@@ -133,6 +156,7 @@
       position: relative;
       overflow: hidden;
     }
+
     .loader-bar::after {
       content: '';
       position: absolute;
@@ -143,7 +167,16 @@
       background: var(--accent);
       animation: slide 1.2s ease-in-out infinite;
     }
-    @keyframes slide { 0% { left: -40%; } 100% { left: 120%; } }
+
+    @keyframes slide {
+      0% {
+        left: -40%;
+      }
+
+      100% {
+        left: 120%;
+      }
+    }
 
     .loading-text {
       font-size: 0.6rem;
@@ -168,7 +201,9 @@
       gap: 8px;
       white-space: nowrap;
     }
-    .viewer-hint::before, .viewer-hint::after {
+
+    .viewer-hint::before,
+    .viewer-hint::after {
       content: '';
       display: block;
       width: 24px;
@@ -217,7 +252,10 @@
       line-height: 1.6;
     }
 
-    .divider { height: 1px; background: var(--border); }
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
 
     .section-title {
       font-size: 0.58rem;
@@ -228,7 +266,10 @@
     }
 
     /* Specs */
-    .specs { display: flex; flex-direction: column; }
+    .specs {
+      display: flex;
+      flex-direction: column;
+    }
 
     .spec-row {
       display: flex;
@@ -237,7 +278,10 @@
       padding: 11px 0;
       border-bottom: 1px solid var(--warm-grey);
     }
-    .spec-row:first-child { border-top: 1px solid var(--warm-grey); }
+
+    .spec-row:first-child {
+      border-top: 1px solid var(--warm-grey);
+    }
 
     .spec-key {
       font-size: 0.65rem;
@@ -245,6 +289,7 @@
       text-transform: uppercase;
       color: var(--mid-grey);
     }
+
     .spec-val {
       font-size: 0.78rem;
       color: var(--dark);
@@ -292,7 +337,10 @@
       flex-shrink: 0;
       transition: border-color 0.3s;
     }
-    .toggle-btn.open .drawer-icon { border-color: rgba(255,255,255,0.3); }
+
+    .toggle-btn.open .drawer-icon {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
 
     .drawer-icon .d-line {
       position: absolute;
@@ -303,7 +351,10 @@
       background: var(--border);
       transition: background 0.3s;
     }
-    .toggle-btn.open .drawer-icon .d-line { background: rgba(255,255,255,0.15); }
+
+    .toggle-btn.open .drawer-icon .d-line {
+      background: rgba(255, 255, 255, 0.15);
+    }
 
     .drawer-icon .d-handle {
       position: absolute;
@@ -315,12 +366,15 @@
       background: var(--mid-grey);
       transition: left 0.5s ease, background 0.3s;
     }
+
     .toggle-btn.open .drawer-icon .d-handle {
       left: calc(50% + 7px);
-      background: rgba(255,255,255,0.4);
+      background: rgba(255, 255, 255, 0.4);
     }
 
-    .toggle-text { text-align: left; }
+    .toggle-text {
+      text-align: left;
+    }
 
     .toggle-label {
       display: block;
@@ -330,7 +384,10 @@
       color: var(--dark);
       transition: color 0.3s;
     }
-    .toggle-btn.open .toggle-label { color: var(--white); }
+
+    .toggle-btn.open .toggle-label {
+      color: var(--white);
+    }
 
     .toggle-sub {
       display: block;
@@ -340,7 +397,10 @@
       margin-top: 2px;
       transition: color 0.3s;
     }
-    .toggle-btn.open .toggle-sub { color: rgba(255,255,255,0.4); }
+
+    .toggle-btn.open .toggle-sub {
+      color: rgba(255, 255, 255, 0.4);
+    }
 
     .toggle-arrow {
       width: 18px;
@@ -348,14 +408,21 @@
       flex-shrink: 0;
       transition: transform 0.4s ease;
     }
+
     .toggle-arrow polyline {
       stroke: var(--mid-grey);
       stroke-width: 1.5;
       fill: none;
       transition: stroke 0.3s;
     }
-    .toggle-btn.open .toggle-arrow { transform: rotate(180deg); }
-    .toggle-btn.open .toggle-arrow polyline { stroke: rgba(255,255,255,0.5); }
+
+    .toggle-btn.open .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    .toggle-btn.open .toggle-arrow polyline {
+      stroke: rgba(255, 255, 255, 0.5);
+    }
 
     /* CTA */
     .cta-section {
@@ -383,9 +450,14 @@
       gap: 12px;
       transition: background 0.25s;
     }
-    .ar-btn:hover { background: var(--accent); }
+
+    .ar-btn:hover {
+      background: var(--accent);
+    }
+
     .ar-btn svg {
-      width: 16px; height: 16px;
+      width: 16px;
+      height: 16px;
       stroke: currentColor;
       fill: none;
       stroke-width: 1.5;
@@ -406,7 +478,11 @@
       cursor: pointer;
       transition: all 0.25s;
     }
-    .enquire-btn:hover { border-color: var(--dark); color: var(--dark); }
+
+    .enquire-btn:hover {
+      border-color: var(--dark);
+      color: var(--dark);
+    }
 
     .ar-note {
       font-size: 0.57rem;
@@ -418,177 +494,360 @@
 
     /* Mobile */
     @media (max-width: 860px) {
-      .main { grid-template-columns: 1fr; }
-      .sidebar { border-left: none; border-top: 1px solid var(--border); }
-      header { padding: 18px 20px; }
-      .header-nav { display: none; }
-      .breadcrumb { padding: 10px 20px; }
-      .sidebar-inner { padding: 28px 20px; }
-      model-viewer { min-height: 50vh; }
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+
+      header {
+        padding: 18px 20px;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      .breadcrumb {
+        padding: 10px 20px;
+      }
+
+      .sidebar-inner {
+        padding: 28px 20px;
+      }
+
+      model-viewer {
+        min-height: 50vh;
+      }
+    }
+
+    /* =========================================
+       AR Modal Styles (Herman Miller style)
+       ========================================= */
+    .hm-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+
+    .hm-modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fbfbfb;
+      padding: 32px;
+      border-radius: 6px;
+      width: 90%;
+      max-width: 520px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .hm-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .hm-modal-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #222;
+      font-family: inherit;
+    }
+
+    .hm-modal-close {
+      background: transparent;
+      border: 2px solid #000;
+      border-radius: 4px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      padding: 0;
+      transition: background-color 0.2s;
+    }
+
+    .hm-modal-close:hover {
+      background-color: #eee;
+    }
+
+    .hm-modal-close svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .hm-modal-desc {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #333;
+      margin: 0 0 24px 0;
+      font-family: inherit;
+    }
+
+    .hm-modal-visuals {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .hm-demo-image {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      border-radius: 4px;
+      object-fit: cover;
+      aspect-ratio: 4 / 3;
+      background-color: #eaeaea;
+    }
+
+    .hm-qr-code {
+      width: 140px;
+      height: 140px;
+      flex-shrink: 0;
+    }
+
+    .hm-modal-footnote {
+      font-size: 11px;
+      line-height: 1.4;
+      color: #000;
+      margin: 0;
+      font-family: inherit;
+    }
+
+    .hm-modal-footnote strong {
+      font-weight: 700;
     }
   </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">Timberline</div>
-  <ul class="header-nav">
-    <li><a href="#">Products</a></li>
-    <li><a href="#">Finishes</a></li>
-    <li><a href="#">Resources</a></li>
-    <li><a href="#">About</a></li>
-  </ul>
-  <a href="#" class="header-cta">Contact Us</a>
-</header>
+  <header>
+    <div class="logo">Timberline</div>
+    <ul class="header-nav">
+      <li><a href="#">Products</a></li>
+      <li><a href="#">Finishes</a></li>
+      <li><a href="#">Resources</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+    <a href="#" class="header-cta">Contact Us</a>
+  </header>
 
-<div class="breadcrumb">
-  Products <span>/</span> Bedroom Furniture <span>/</span> Somnus
-</div>
-
-<div class="main">
-
-  <div class="viewer-wrap">
-    <div class="loading-overlay" id="loadingOverlay">
-      <div class="loader-bar"></div>
-      <div class="loading-text">Loading 3D Model</div>
-    </div>
-
-    <model-viewer
-      id="cabinetViewer"
-      src="testmotion9.glb"
-      ios-src="testmotion9.usdz"
-      alt="Somnus bathroom vanity SOB-B-500-602"
-      camera-controls
-      auto-rotate
-      auto-rotate-delay="2000"
-      rotation-per-second="10deg"
-      ar
-      ar-modes="webxr scene-viewer quick-look"
-      shadow-intensity="0.8"
-      shadow-softness="1"
-      environment-image="neutral"
-      exposure="1.1"
-    ></model-viewer>
-
-    <div class="viewer-hint">Drag to rotate &nbsp;·&nbsp; Pinch to zoom</div>
+  <div class="breadcrumb">
+    Products <span>/</span> Bedroom Furniture <span>/</span> Somnus
   </div>
 
-  <aside class="sidebar">
-    <div class="sidebar-inner">
+  <div class="main">
 
-      <div>
-        <p class="product-category">Bedroom Furniture</p>
-        <h1 class="product-title">Two Drawers<br>Bedside Table</h1>
-        <p class="product-subtitle">SOB-B-500-602 &nbsp;·&nbsp; Florentine Walnut<br>Brushed Stainless Hardware</p>
+    <div class="viewer-wrap">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader-bar"></div>
+        <div class="loading-text">Loading 3D Model</div>
       </div>
 
-      <div class="divider"></div>
+      <model-viewer id="cabinetViewer" src="testmotion9.glb" ios-src="testmotion9.usdz"
+        alt="Somnus bathroom vanity SOB-B-500-602" camera-controls auto-rotate auto-rotate-delay="2000"
+        rotation-per-second="10deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="0.8"
+        shadow-softness="1" environment-image="neutral" exposure="1.1"></model-viewer>
 
-      <div>
-        <p class="section-title">Specifications</p>
-        <div class="specs">
-          <div class="spec-row">
-            <span class="spec-key">Width</span>
-            <span class="spec-val">500 mm</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-key">Height</span>
-            <span class="spec-val">600 mm</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-key">Depth</span>
-            <span class="spec-val">410 mm</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-key">Finish</span>
-            <span class="spec-val">Florentine Walnut</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-key">Hardware</span>
-            <span class="spec-val">Brushed Stainless</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-key">Drawers</span>
-            <span class="spec-val">2 Soft-Close</span>
+      <div class="viewer-hint">Drag to rotate &nbsp;·&nbsp; Pinch to zoom</div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+
+        <div>
+          <p class="product-category">Bedroom Furniture</p>
+          <h1 class="product-title">Two Drawers<br>Bedside Table</h1>
+          <p class="product-subtitle">SOB-B-500-602 &nbsp;·&nbsp; Florentine Walnut<br>Brushed Stainless Hardware</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+          <p class="section-title">Specifications</p>
+          <div class="specs">
+            <div class="spec-row">
+              <span class="spec-key">Width</span>
+              <span class="spec-val">500 mm</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Height</span>
+              <span class="spec-val">600 mm</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Depth</span>
+              <span class="spec-val">410 mm</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Finish</span>
+              <span class="spec-val">Florentine Walnut</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Hardware</span>
+              <span class="spec-val">Brushed Stainless</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Drawers</span>
+              <span class="spec-val">2 Soft-Close</span>
+            </div>
           </div>
         </div>
+
+        <div class="divider"></div>
+
+        <div>
+          <p class="section-title">Interactive</p>
+          <button class="toggle-btn" id="toggleBtn" onclick="toggleDrawers()">
+            <div class="toggle-left">
+              <div class="drawer-icon">
+                <div class="d-line"></div>
+                <div class="d-handle"></div>
+              </div>
+              <div class="toggle-text">
+                <span class="toggle-label" id="toggleLabel">Open Drawers</span>
+                <span class="toggle-sub" id="toggleSub">Click to open</span>
+              </div>
+            </div>
+            <svg class="toggle-arrow" viewBox="0 0 18 18">
+              <polyline points="4 7 9 12 14 7" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="cta-section">
+          <button class="ar-btn" id="openArModalBtn">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+            View in Your Space
+          </button>
+          <button class="enquire-btn">Enquire Now</button>
+          <p class="ar-note">Requires iOS Safari or Android Chrome</p>
+        </div>
+
       </div>
+    </aside>
+  </div>
 
-      <div class="divider"></div>
-
-      <div>
-        <p class="section-title">Interactive</p>
-        <button class="toggle-btn" id="toggleBtn" onclick="toggleDrawers()">
-          <div class="toggle-left">
-            <div class="drawer-icon">
-              <div class="d-line"></div>
-              <div class="d-handle"></div>
-            </div>
-            <div class="toggle-text">
-              <span class="toggle-label" id="toggleLabel">Open Drawers</span>
-              <span class="toggle-sub" id="toggleSub">Click to open</span>
-            </div>
-          </div>
-          <svg class="toggle-arrow" viewBox="0 0 18 18">
-            <polyline points="4 7 9 12 14 7"/>
+  <!-- AR Modal HTML -->
+  <div id="arModal" class="hm-modal-overlay">
+    <div class="hm-modal-content">
+      <div class="hm-modal-header">
+        <h2 class="hm-modal-title">View in AR</h2>
+        <button id="closeArModalBtn" class="hm-modal-close" aria-label="Close">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L13 13M1 13L13 1" stroke="black" stroke-width="1.5" />
           </svg>
         </button>
       </div>
-
-      <div class="cta-section">
-        <button class="ar-btn" onclick="launchAR()">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
-          View in Your Space
-        </button>
-        <button class="enquire-btn">Enquire Now</button>
-        <p class="ar-note">Requires iOS Safari or Android Chrome</p>
+      <p class="hm-modal-desc">
+        Place true-to-scale products in your own living space.<br>
+        Point your mobile device camera at the QR code below to see this product come to life in augmented reality.*
+      </p>
+      <div class="hm-modal-visuals">
+        <img class="hm-demo-image" src="assets/use ar in bathroom1K.jpg" alt="AR Demonstration">
+        <img class="hm-qr-code"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tj-83.github.io/ar-test/cabinet-viewer.html"
+          alt="Scan to view AR">
       </div>
-
+      <p class="hm-modal-footnote">
+        *The augmented reality experience is currently supported by the following devices:<br>
+        <strong>iPhone on iOS 12+ and Android 8.0+ with ARCore 1.9+ support</strong>
+      </p>
     </div>
-  </aside>
-</div>
+  </div>
 
-<script>
-  const viewer = document.getElementById('cabinetViewer');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const toggleLabel = document.getElementById('toggleLabel');
-  const toggleSub = document.getElementById('toggleSub');
+  <script>
+    const viewer = document.getElementById('cabinetViewer');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const toggleLabel = document.getElementById('toggleLabel');
+    const toggleSub = document.getElementById('toggleSub');
 
-  const ANIMATION_NAME = 'Drawer_Open_Close';
-  let isOpen = false;
+    const ANIMATION_NAME = 'Drawer_Open_Close';
+    let isOpen = false;
 
-  viewer.addEventListener('load', () => {
-    document.getElementById('loadingOverlay').classList.add('hidden');
-    console.log('Available animations:', viewer.availableAnimations);
-  });
+    viewer.addEventListener('load', () => {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      console.log('Available animations:', viewer.availableAnimations);
+    });
 
-  function toggleDrawers() {
-    isOpen = !isOpen;
-    viewer.animationName = ANIMATION_NAME;
+    function toggleDrawers() {
+      isOpen = !isOpen;
+      viewer.animationName = ANIMATION_NAME;
 
-    if (isOpen) {
-      viewer.timeScale = 1;
-      viewer.play({ repetitions: 1 });
-      toggleBtn.classList.add('open');
-      toggleLabel.textContent = 'Close Drawers';
-      toggleSub.textContent = 'Click to close';
-    } else {
-      viewer.timeScale = -1;
-      viewer.play({ repetitions: 1 });
-      toggleBtn.classList.remove('open');
-      toggleLabel.textContent = 'Open Drawers';
-      toggleSub.textContent = 'Click to open';
+      if (isOpen) {
+        viewer.timeScale = 1;
+        viewer.play({ repetitions: 1 });
+        toggleBtn.classList.add('open');
+        toggleLabel.textContent = 'Close Drawers';
+        toggleSub.textContent = 'Click to close';
+      } else {
+        viewer.timeScale = -1;
+        viewer.play({ repetitions: 1 });
+        toggleBtn.classList.remove('open');
+        toggleLabel.textContent = 'Open Drawers';
+        toggleSub.textContent = 'Click to open';
+      }
     }
-  }
 
-  function launchAR() {
-    viewer.activateAR();
-  }
-</script>
+    function launchAR() {
+      viewer.activateAR();
+    }
 
+    // Device Detection Logic
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // AR Modal / Direct Launch Logic
+    const arModal = document.getElementById('arModal');
+    const openArModalBtn = document.getElementById('openArModalBtn');
+    const closeArModalBtn = document.getElementById('closeArModalBtn');
+
+    openArModalBtn.addEventListener('click', () => {
+      if (isMobileDevice()) {
+        // 如果是手机/平板，直接启动 AR
+        launchAR();
+      } else {
+        // 如果是电脑（桌面端），显示弹窗引导扫码
+        arModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    });
+
+    closeArModalBtn.addEventListener('click', () => {
+      arModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === arModal) {
+        arModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+  </script>
 </body>
+
 </html>
