@@ -108,21 +108,42 @@
     /* Main Layout */
     .main {
       display: grid;
-      grid-template-columns: 1fr 380px;
+      grid-template-columns: minmax(auto, 1fr) 400px;
       min-height: calc(100vh - 121px);
+      gap: 40px;
     }
 
-    /* Viewer */
+    /* Left Side: Viewer & Actions */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      /* Align left */
+      padding: 40px 0 40px 48px;
+    }
+
+    /* Viewer Container */
     .viewer-wrap {
       position: relative;
-      background: var(--off-white);
+      background: #f7f7f7;
+      /* Very light gray comparable to Herman Miller */
+      border-radius: 4px;
+      /* Optional subtle rounding */
+      width: 100%;
+      max-width: 800px;
+      /* Constrain max width so it doesn't blow up on huge screens */
+      aspect-ratio: 4 / 3;
+      /* Fix an aspect ratio like a product photo */
+      max-height: 70vh;
+      /* Ensure it stays visible on smaller screens */
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     model-viewer {
       width: 100%;
       height: 100%;
-      min-height: 620px;
       --poster-color: transparent;
       background-color: transparent;
     }
@@ -139,7 +160,7 @@
       align-items: center;
       justify-content: center;
       gap: 20px;
-      background: var(--off-white);
+      background: #f7f7f7;
       transition: opacity 0.8s ease;
       pointer-events: none;
       z-index: 10;
@@ -209,6 +230,42 @@
       width: 24px;
       height: 1px;
       background: var(--border);
+    }
+
+    /* Viewer Actions (Below the 3D viewer) */
+    .viewer-actions-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 24px;
+      width: 100%;
+      max-width: 800px;
+      padding-bottom: 20px;
+    }
+
+    .viewer-action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--dark);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .viewer-action-link:hover {
+      opacity: 0.7;
+    }
+
+    .viewer-action-link svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
     }
 
     /* Sidebar */
@@ -296,30 +353,37 @@
       font-weight: 400;
     }
 
-    /* Drawer Toggle Button */
+    /* Drawer Toggle Button (Floating Bottom Right) */
     .toggle-btn {
-      width: 100%;
-      display: flex;
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 18px 22px;
-      background: var(--off-white);
-      border: 1px solid var(--border);
+      padding: 10px 16px;
+      background: var(--white);
+      border: 1px solid var(--text);
+      border-radius: 4px;
       cursor: pointer;
-      font-family: 'Raleway', sans-serif;
-      font-weight: 300;
-      transition: all 0.3s ease;
-      gap: 16px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      gap: 10px;
+      z-index: 20;
+      color: var(--text);
     }
 
     .toggle-btn:hover {
-      background: var(--warm-grey);
-      border-color: var(--accent-light);
+      background: var(--text);
+      color: var(--white);
     }
 
     .toggle-btn.open {
-      background: var(--dark);
-      border-color: var(--dark);
+      background: var(--text);
+      color: var(--white);
+      border-color: var(--text);
     }
 
     .toggle-left {
@@ -361,15 +425,14 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 9px;
-      height: 2.5px;
-      background: var(--mid-grey);
-      transition: left 0.5s ease, background 0.3s;
+      width: 6px;
+      height: 2px;
+      background: currentColor;
+      transition: left 0.5s ease;
     }
 
     .toggle-btn.open .drawer-icon .d-handle {
-      left: calc(50% + 7px);
-      background: rgba(255, 255, 255, 0.4);
+      left: calc(50% + 5px);
     }
 
     .toggle-text {
@@ -378,50 +441,13 @@
 
     .toggle-label {
       display: block;
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--dark);
       transition: color 0.3s;
     }
 
-    .toggle-btn.open .toggle-label {
-      color: var(--white);
-    }
-
-    .toggle-sub {
-      display: block;
-      font-size: 0.62rem;
-      letter-spacing: 0.08em;
-      color: var(--mid-grey);
-      margin-top: 2px;
-      transition: color 0.3s;
-    }
-
-    .toggle-btn.open .toggle-sub {
-      color: rgba(255, 255, 255, 0.4);
-    }
-
+    /* Hide the old sub/arrow elements in the new minimal button */
+    .toggle-sub,
     .toggle-arrow {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      transition: transform 0.4s ease;
-    }
-
-    .toggle-arrow polyline {
-      stroke: var(--mid-grey);
-      stroke-width: 1.5;
-      fill: none;
-      transition: stroke 0.3s;
-    }
-
-    .toggle-btn.open .toggle-arrow {
-      transform: rotate(180deg);
-    }
-
-    .toggle-btn.open .toggle-arrow polyline {
-      stroke: rgba(255, 255, 255, 0.5);
+      display: none;
     }
 
     /* CTA */
@@ -464,6 +490,7 @@
       opacity: 0.7;
     }
 
+    /* Secondary Actions CTA (Enquire) */
     .enquire-btn {
       width: 100%;
       padding: 15px 24px;
@@ -477,6 +504,7 @@
       text-transform: uppercase;
       cursor: pointer;
       transition: all 0.25s;
+      margin-top: 12px;
     }
 
     .enquire-btn:hover {
@@ -484,44 +512,39 @@
       color: var(--dark);
     }
 
-    .ar-note {
-      font-size: 0.57rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--mid-grey);
-      text-align: center;
+    /* Absolute floating AR Button */
+    .floating-ar-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: var(--white);
+      border: 1px solid var(--text);
+      border-radius: 4px;
+      color: var(--text);
+      padding: 10px 16px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      z-index: 20;
+      transition: all 0.2s;
     }
 
-    /* Mobile */
-    @media (max-width: 860px) {
-      .main {
-        grid-template-columns: 1fr;
-      }
+    .floating-ar-btn:hover {
+      background: var(--text);
+      color: var(--white);
+    }
 
-      .sidebar {
-        border-left: none;
-        border-top: 1px solid var(--border);
-      }
-
-      header {
-        padding: 18px 20px;
-      }
-
-      .header-nav {
-        display: none;
-      }
-
-      .breadcrumb {
-        padding: 10px 20px;
-      }
-
-      .sidebar-inner {
-        padding: 28px 20px;
-      }
-
-      model-viewer {
-        min-height: 50vh;
-      }
+    .floating-ar-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
     }
 
     /* =========================================
@@ -684,20 +707,71 @@
 
   <div class="main">
 
-    <div class="viewer-wrap">
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="loader-bar"></div>
-        <div class="loading-text">Loading 3D Model</div>
+    <!-- Left Panel: 3D Viewer & Bottom Actions -->
+    <div class="left-panel">
+      <div class="viewer-wrap">
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="loader-bar"></div>
+          <div class="loading-text">Loading 3D Model</div>
+        </div>
+
+        <model-viewer id="cabinetViewer" src="testmotion9.glb" ios-src="testmotion9.usdz"
+          alt="Somnus bathroom vanity SOB-B-500-602" camera-controls auto-rotate auto-rotate-delay="2000"
+          rotation-per-second="10deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="0.8"
+          shadow-softness="1" environment-image="neutral" exposure="1.1"></model-viewer>
+
+        <!-- HM Style Floating AR Button inside the viewer box -->
+        <button class="floating-ar-btn" id="openArModalBtn">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+          View in AR
+        </button>
+
+        <div class="viewer-hint">Drag to rotate &nbsp;·&nbsp; Pinch to zoom</div>
+
+        <!-- Floating Drawer Toggle Button inside the viewer box -->
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDrawers()">
+          <div class="toggle-left">
+            <div class="drawer-icon">
+              <div class="d-line"></div>
+              <div class="d-handle"></div>
+            </div>
+            <div class="toggle-text">
+              <span class="toggle-label" id="toggleLabel">Open Drawers</span>
+            </div>
+          </div>
+        </button>
+
       </div>
 
-      <model-viewer id="cabinetViewer" src="testmotion9.glb" ios-src="testmotion9.usdz"
-        alt="Somnus bathroom vanity SOB-B-500-602" camera-controls auto-rotate auto-rotate-delay="2000"
-        rotation-per-second="10deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="0.8"
-        shadow-softness="1" environment-image="neutral" exposure="1.1"></model-viewer>
-
-      <div class="viewer-hint">Drag to rotate &nbsp;·&nbsp; Pinch to zoom</div>
+      <!-- Herman Miller style bottom action links -->
+      <div class="viewer-actions-row">
+        <a href="assets/TriggerAR.pdf" class="viewer-action-link" download
+          title="Print this card and place it on your site. Scan it to launch a dynamic 3D vanity model in place.">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download TriggerAR Image
+        </a>
+        <a href="#" class="viewer-action-link" onclick="event.preventDefault();">
+          <svg viewBox="0 0 24 24">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share Your Design
+        </a>
+      </div>
     </div>
 
+    <!-- Right Panel: Configurations -->
     <aside class="sidebar">
       <div class="sidebar-inner">
 
@@ -743,38 +817,42 @@
 
         <div>
           <p class="section-title">Interactive</p>
-          <button class="toggle-btn" id="toggleBtn" onclick="toggleDrawers()">
-            <div class="toggle-left">
-              <div class="drawer-icon">
-                <div class="d-line"></div>
-                <div class="d-handle"></div>
-              </div>
-              <div class="toggle-text">
-                <span class="toggle-label" id="toggleLabel">Open Drawers</span>
-                <span class="toggle-sub" id="toggleSub">Click to open</span>
-              </div>
-            </div>
-            <svg class="toggle-arrow" viewBox="0 0 18 18">
-              <polyline points="4 7 9 12 14 7" />
-            </svg>
-          </button>
         </div>
 
         <div class="cta-section">
-          <button class="ar-btn" id="openArModalBtn">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-            View in Your Space
-          </button>
           <button class="enquire-btn">Enquire Now</button>
-          <p class="ar-note">Requires iOS Safari or Android Chrome</p>
         </div>
 
       </div>
     </aside>
+  </div>
+
+  <!-- AR Modal HTML -->
+  <div id="arModal" class="hm-modal-overlay">
+    <div class="hm-modal-content">
+      <div class="hm-modal-header">
+        <h2 class="hm-modal-title">View in AR</h2>
+        <button id="closeArModalBtn" class="hm-modal-close" aria-label="Close">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L13 13M1 13L13 1" stroke="black" stroke-width="1.5" />
+          </svg>
+        </button>
+      </div>
+      <p class="hm-modal-desc">
+        Place true-to-scale products in your own living space.<br>
+        Point your mobile device camera at the QR code below to see this product come to life in augmented reality.*
+      </p>
+      <div class="hm-modal-visuals">
+        <img class="hm-demo-image" src="assets/use ar in bathroom1K.jpg" alt="AR Demonstration">
+        <img class="hm-qr-code"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tj-83.github.io/ar-test/cabinet-viewer.html"
+          alt="Scan to view AR">
+      </div>
+      <p class="hm-modal-footnote">
+        *The augmented reality experience is currently supported by the following devices:<br>
+        <strong>iPhone on iOS 12+ and Android 8.0+ with ARCore 1.9+ support</strong>
+      </p>
+    </div>
   </div>
 
   <script>
