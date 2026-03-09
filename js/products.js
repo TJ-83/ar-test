@@ -1,6 +1,7 @@
 const CATEGORY_CONFIG = {
     "handles": {
-        "Arch Pull": ["brushed_stainless", "brushed_gold", "matte_black_handle"]
+        "OVA 350": ["HARDWARE Black", "HARDWARE Brushed Gold", "HARDWARE Brushed Nickel", "HARDWARE Chrome"],
+        "Wave Pull": ["HARDWARE Black", "HARDWARE Brushed Gold", "HARDWARE Brushed Nickel", "HARDWARE Chrome"]
     },
     "tops": {
         "Same as Cabinet": [],
@@ -14,7 +15,7 @@ const PRODUCT_CONFIG = {
         "mount": ["Floor Standing"],
         "size": ["500 mm"],
         "cabinet": ["boston_oak", "florentine_walnut", "PAINT Olive Satin", "PAINT Taubmans Saxby Blue", "PAINT New Penny", "PAINT White Satin"],
-        "handleCategory": ["Arch Pull"],
+        "handleCategory": ["OVA 350", "Wave Pull"],
         "topCategory": ["Same as Cabinet"]
     }
 };

@@ -47,29 +47,33 @@ const MATERIAL_LIBRARY = {
     "usdz": "./testmotion9.usdz",
     "roughness": 0.8
   },
-  "brushed_stainless": {
-    "type": "color",
-    "name": "Brushed Stainless",
-    "thumbColor": "#cccccc",
-    "colorHex": "#B0B8C1",
-    "usdz": "./testmotion9.usdz",
-    "roughness": 0.3
-  },
-  "brushed_gold": {
-    "type": "color",
-    "name": "Brushed Gold",
-    "thumbColor": "#d4af37",
-    "colorHex": "#C49A3C",
-    "usdz": "./testmotion9.usdz",
-    "roughness": 0.3
-  },
-  "matte_black_handle": {
-    "type": "color",
+  "HARDWARE Black": {
+    "type": "texture",
     "name": "Matte Black",
-    "thumbColor": "#222222",
-    "colorHex": "#1C1C1C",
+    "texture": "./assets/textures/Hardware/HARDWARE Black.jpg",
     "usdz": "./testmotion9.usdz",
     "roughness": 0.5
+  },
+  "HARDWARE Brushed Gold": {
+    "type": "texture",
+    "name": "Brushed Gold",
+    "texture": "./assets/textures/Hardware/HARDWARE Brushed Gold.jpg",
+    "usdz": "./testmotion9.usdz",
+    "roughness": 0.3
+  },
+  "HARDWARE Brushed Nickel": {
+    "type": "texture",
+    "name": "Brushed Nickel",
+    "texture": "./assets/textures/Hardware/HARDWARE Brushed_Nickel_2048x2048.jpg",
+    "usdz": "./testmotion9.usdz",
+    "roughness": 0.3
+  },
+  "HARDWARE Chrome": {
+    "type": "texture",
+    "name": "Chrome",
+    "texture": "./assets/textures/Hardware/HARDWARE Chrome.jpg",
+    "usdz": "./testmotion9.usdz",
+    "roughness": 0.1
   },
   "carrara_matte": {
     "type": "color",

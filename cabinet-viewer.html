@@ -919,7 +919,7 @@
           <div class="loading-text">Loading 3D Model</div>
         </div>
 
-        <model-viewer id="cabinetViewer" src="testmotion9.glb" ios-src="testmotion9.usdz"
+        <model-viewer id="cabinetViewer" src="testmotion10.glb" ios-src="testmotion10.usdz"
           alt="Somnus bathroom vanity SOB-B-500-602" camera-controls auto-rotate auto-rotate-delay="2000"
           rotation-per-second="10deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="0.8"
           shadow-softness="1" environment-image="neutral" exposure="1.1"></model-viewer>
@@ -1275,18 +1275,25 @@
       console.log('Cabinet mats:', cabinetMats.length, 'Handle mats:', handleMats.length, 'Top mats:', topMats.length);
     });
 
-    // 封装异步纹理替换函数
+    // 封装异步纹理替换函数 (带全局缓存)
+    const textureCache = {};
+
     async function applyTextureToGroup(matsArray, texturePath, roughness = 0.5, fallbackHex = null) {
       if (!matsArray) return;
 
       let newTexture = null;
       if (texturePath) {
-        try {
-          // Model-Viewer async texture creation
-          console.log("Loading texture:", texturePath);
-          newTexture = await viewer.createTexture(texturePath);
-        } catch (error) {
-          console.error('Failed to load texture:', texturePath, error);
+        if (textureCache[texturePath]) {
+          newTexture = textureCache[texturePath];
+        } else {
+          try {
+            // Model-Viewer async texture creation
+            console.log("Loading texture:", texturePath);
+            newTexture = await viewer.createTexture(texturePath);
+            textureCache[texturePath] = newTexture;
+          } catch (error) {
+            console.error('Failed to load texture:', texturePath, error);
+          }
         }
       }
 
@@ -1403,6 +1410,12 @@
               const activeTop = topCategoryGrid.querySelector('.text-option.selected');
               if (activeTop && activeTop.dataset.val === "Same as Cabinet") {
                 await applyTextureToGroup(topMats, textureUrl, roughnessValue, hexColor);
+
+                // UX fix: deselect any top color swatch because it's now mirroring the cabinet
+                const topColorGrid = document.getElementById('top-color-grid');
+                if (topColorGrid) {
+                  topColorGrid.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+                }
               }
             }
           }
@@ -1411,6 +1424,75 @@
           updateARSource(textureUrl);
         });
       });
+    }
+
+    // Geometry Swapping Logic for Handles
+    const MESH_NODE_MAP = {
+      "OVA 350": ["ova350", "body1006"],
+      "Wave Pull": ["350mmwave", "body1008"]
+    };
+
+    function applyHandleVisibility(activeCategory) {
+      const viewer = document.getElementById('cabinetViewer');
+
+      let sceneSymbol = Object.getOwnPropertySymbols(viewer).find(e => String(e) === 'Symbol(scene)' || (e.description && e.description.includes('scene')));
+      if (!sceneSymbol && Object.getPrototypeOf(viewer)) {
+        sceneSymbol = Object.getOwnPropertySymbols(Object.getPrototypeOf(viewer)).find(e => String(e) === 'Symbol(scene)' || (e.description && e.description.includes('scene')));
+      }
+
+      if (!sceneSymbol) {
+        console.error("Debug Error: Could not find internal scene symbol in model-viewer");
+        return;
+      }
+      const scene = viewer[sceneSymbol];
+
+      if (!scene) {
+        console.error("Debug Error: Scene is null");
+        return;
+      }
+
+      const activeKeywords = MESH_NODE_MAP[activeCategory] || [];
+      const allHandleKeywords = Object.values(MESH_NODE_MAP).flat();
+      let foundHandles = [];
+
+      const sanitize = (n) => n.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const sanitizedActiveKws = activeKeywords.map(sanitize);
+      const sanitizedAllKws = allHandleKeywords.map(sanitize);
+
+      scene.traverse((node) => {
+        if (!node.name) return;
+        const sName = sanitize(node.name);
+
+        const isHandleNode = sanitizedAllKws.some(kw => sName.includes(kw));
+        if (isHandleNode) {
+          foundHandles.push(node.name);
+
+          // Save original scale on the very first pass to restore later
+          if (!node.userData.originalScale) {
+            node.userData.originalScale = { x: node.scale.x, y: node.scale.y, z: node.scale.z };
+          }
+
+          const isActive = sanitizedActiveKws.some(kw => sName.includes(kw));
+          if (isActive) {
+            // Restore proper scale
+            const os = node.userData.originalScale;
+            node.scale.set(os.x, os.y, os.z);
+            node.visible = true;
+
+            // Enforce parent visibility
+            let p = node.parent;
+            while (p && p.type !== 'Scene') {
+              p.visible = true;
+              p = p.parent;
+            }
+          } else {
+            // Shrink completely so animation glitches don't make it appear
+            node.scale.set(0, 0, 0);
+            node.visible = false;
+          }
+        }
+      });
+      // console.log(`Debug Handle Swap: Found ${foundHandles.length} handles matching ${allHandleKeywords.join(', ')}`);
     }
 
     // Handles the two-tier Category -> Color logic
@@ -1461,6 +1543,11 @@
 
           // Render the newly selected colors
           renderColorSwatches(materialsToRender, colorGridId, targetMatsArray);
+
+          // Invoke handle geometry swapping logic if applicable
+          if (partType === 'handleCategory') {
+            applyHandleVisibility(selectedCategory);
+          }
 
           // Auto-apply selection to 3D model
           const firstSwatch = document.querySelector(`#${colorGridId} .swatch`);
@@ -1536,6 +1623,24 @@
     // 3. Initialize Two-Tier Categories (Handle, Top)
     setupCategoryGrid('handleCategory', 'handle-category-grid', 'handle-color-grid', 'handles', () => handleMats);
     setupCategoryGrid('topCategory', 'top-category-grid', 'top-color-grid', 'tops', () => topMats);
+
+    // Initial pass to hide unseen geometry meshes and apply default colors when the model officially loads
+    viewer.addEventListener('load', () => {
+      // 1. Initial Geometry Swapping
+      const activeHandleOpt = document.querySelector('#handle-category-grid .text-option.selected');
+      if (activeHandleOpt) {
+        applyHandleVisibility(activeHandleOpt.dataset.val);
+      }
+
+      // 2. Initial Color Application for Handles
+      // Use setTimeout to ensure all DOM elements are rendered and internal arrays are populated
+      setTimeout(() => {
+        const firstHandleColor = document.querySelector('#handle-color-grid .swatch');
+        if (firstHandleColor) {
+          firstHandleColor.click();
+        }
+      }, 50);
+    });
 
     // ---------------------------
 
