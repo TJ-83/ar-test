@@ -584,6 +584,77 @@
       display: none;
     }
 
+    /* =========================================
+       3D Dimension Lines & Labels
+       ========================================= */
+
+    /* SVG overlay – lives inside <model-viewer> so it renders above WebGL canvas */
+    #dimSvg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: visible;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #dimSvg.visible {
+      opacity: 1;
+    }
+
+    .dim-line {
+      stroke: var(--dark);
+      stroke-width: 1.2;
+      stroke-dasharray: 4 3;
+      opacity: 0.65;
+    }
+
+    .dim-tick {
+      stroke: var(--dark);
+      stroke-width: 1.5;
+      opacity: 0.75;
+    }
+
+    /* Hotspot labels – positioned by model-viewer into 2D space */
+    .dim-label {
+      background: var(--dark);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      /* model-viewer hotspot centering */
+      transform: translate(-50%, -50%);
+      position: absolute;
+    }
+
+    .dim-label.visible {
+      opacity: 1;
+    }
+
+    .dim-anchor {
+      width: 1px;
+      height: 1px;
+      min-width: 1px;
+      min-height: 1px;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      background: transparent;
+      opacity: 0.01;
+      pointer-events: none;
+    }
+
     /* CTA */
     .cta-section {
       margin-top: auto;
@@ -922,7 +993,40 @@
         <model-viewer id="cabinetViewer" src="testmotion10.glb" ios-src="testmotion10.usdz"
           alt="Somnus bathroom vanity SOB-B-500-602" camera-controls auto-rotate auto-rotate-delay="2000"
           rotation-per-second="10deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="0.8"
-          shadow-softness="1" environment-image="neutral" exposure="1.1"></model-viewer>
+          shadow-softness="1" environment-image="neutral" exposure="1.1">
+
+          <!-- Dimension label hotspots (midpoint of each edge) -->
+          <button slot="hotspot-dim-w" class="dim-label" id="dimLabelW">W: —</button>
+          <button slot="hotspot-dim-h" class="dim-label" id="dimLabelH">H: —</button>
+          <button slot="hotspot-dim-d" class="dim-label" id="dimLabelD">D: —</button>
+
+          <!-- Invisible anchor hotspots – model-viewer positions them in 3D space;
+               we read their screen coords via getBoundingClientRect() to draw SVG lines.
+               They must have size > 0 and opacity > 0 for model-viewer to track them. -->
+          <button slot="hotspot-dim-wa" class="dim-anchor" id="dimAnchorWa"></button>
+          <button slot="hotspot-dim-wb" class="dim-anchor" id="dimAnchorWb"></button>
+          <button slot="hotspot-dim-ha" class="dim-anchor" id="dimAnchorHa"></button>
+          <button slot="hotspot-dim-hb" class="dim-anchor" id="dimAnchorHb"></button>
+          <button slot="hotspot-dim-da" class="dim-anchor" id="dimAnchorDa"></button>
+          <button slot="hotspot-dim-db" class="dim-anchor" id="dimAnchorDb"></button>
+
+          <!-- SVG overlay: inside model-viewer so it stacks above the WebGL canvas.
+               Coordinates are relative to model-viewer's top-left corner. -->
+          <svg id="dimSvg" aria-hidden="true"
+            style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;opacity:0;transition:opacity 0.3s ease;z-index:5;">
+            <line id="dimLineW" class="dim-line" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimLineH" class="dim-line" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimLineD" class="dim-line" x1="0" y1="0" x2="0" y2="0" />
+            <!-- end ticks -->
+            <line id="dimTickWa" class="dim-tick" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimTickWb" class="dim-tick" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimTickHa" class="dim-tick" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimTickHb" class="dim-tick" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimTickDa" class="dim-tick" x1="0" y1="0" x2="0" y2="0" />
+            <line id="dimTickDb" class="dim-tick" x1="0" y1="0" x2="0" y2="0" />
+          </svg>
+
+        </model-viewer>
 
         <!-- HM Style Floating AR Button inside the viewer box -->
         <button class="floating-ar-btn" id="openArModalBtn">
@@ -961,6 +1065,21 @@
               </div>
               <div class="toggle-text">
                 <span class="toggle-label" id="toggleLabel">Start Motion</span>
+              </div>
+            </div>
+          </button>
+
+          <!-- Dimensions Toggle -->
+          <button class="toggle-btn" id="dimBtn" onclick="toggleDimensions()">
+            <div class="toggle-left">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                style="margin-right: 4px; flex-shrink: 0;">
+                <path d="M21 7H3M21 12H3M21 17H3" opacity="0.4" />
+                <path d="M3 3v18M21 3v18" />
+                <path d="M3 3h4M3 21h4M17 3h4M17 21h4" stroke-linecap="round" />
+              </svg>
+              <div class="toggle-text">
+                <span class="toggle-label" id="dimLabel">Show Dimensions</span>
               </div>
             </div>
           </button>
@@ -1640,6 +1759,9 @@
           firstHandleColor.click();
         }
       }, 50);
+
+      // 3. Setup Dimensions (reads bounding box and sets hotspot data-position attributes)
+      setupDimensions();
     });
 
     // ---------------------------
@@ -1675,6 +1797,514 @@
       updateAnimBtn();
     });
 
+    // ------ 3D Dimensions Logic ------
+    let showDimensions = false;
+
+    // Helper: format a 3D point as the data-position string model-viewer expects
+    function fmtPos(x, y, z) { return `${x} ${y} ${z}`; }
+
+    // Stored bounding box data (set once on model load)
+    let dimData = null;
+
+    // Called once after model load.
+    // Reads the THREE.js world-space bounding box of all visible meshes
+    // so that projectPoint3D() (which uses THREE camera matrices) receives
+    // coordinates in the SAME space.
+    // Label hotspot data-position still uses model-viewer's own API (cx/cy/cz
+    // from getDimensions), which model-viewer converts to world space internally.
+    function setupDimensions() {
+      // 1. Get Three.js scene via symbol
+      const allSymbols = [
+        ...Object.getOwnPropertySymbols(viewer),
+        ...Object.getOwnPropertySymbols(Object.getPrototypeOf(viewer))
+      ];
+      const sceneSymbol = allSymbols.find(s => s.description && s.description.includes('scene'));
+      if (!sceneSymbol) return;
+      const threeScene = viewer[sceneSymbol];
+
+      // 2. Walk all Mesh nodes and compute world-space AABB
+      let minX = Infinity, minY = Infinity, minZ = Infinity;
+      let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+      let hasMesh = false;
+
+      threeScene.traverse(obj => {
+        if (!obj.isMesh || !obj.geometry) return;
+        if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox();
+        const box = obj.geometry.boundingBox;
+        if (!box) return;
+        hasMesh = true;
+        const m = obj.matrixWorld.elements; // column-major 4×4
+        // Transform all 8 local-box corners to world space
+        for (const lx of [box.min.x, box.max.x]) {
+          for (const ly of [box.min.y, box.max.y]) {
+            for (const lz of [box.min.z, box.max.z]) {
+              const wx = m[0] * lx + m[4] * ly + m[8] * lz + m[12];
+              const wy = m[1] * lx + m[5] * ly + m[9] * lz + m[13];
+              const wz = m[2] * lx + m[6] * ly + m[10] * lz + m[14];
+              if (wx < minX) minX = wx; if (wx > maxX) maxX = wx;
+              if (wy < minY) minY = wy; if (wy > maxY) maxY = wy;
+              if (wz < minZ) minZ = wz; if (wz > maxZ) maxZ = wz;
+            }
+          }
+        }
+      });
+
+      if (!hasMesh) return; // model not ready
+
+      const hw = (maxX - minX) / 2;
+      const hh = (maxY - minY) / 2;
+      const hd = (maxZ - minZ) / 2;
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const cz = (minZ + maxZ) / 2;
+
+      // Store world-space bbox for use in projectPoint3D()
+      dimData = { cx, cy, cz, hw, hh, hd };
+
+      // 3. Label hotspots: model-viewer API coords (it projects them internally)
+      const size = viewer.getDimensions();
+      const center = viewer.getBoundingBoxCenter();
+      if (size && center) {
+        const mhw = size.x / 2, mhh = size.y / 2, mhd = size.z / 2;
+        const { x: mcx, y: mcy, z: mcz } = center;
+        const wMm = Math.round(size.x * 1000);
+        const hMm = Math.round(size.y * 1000);
+        const dMm = Math.round(size.z * 1000);
+        document.getElementById('dimLabelW').setAttribute('data-position', fmtPos(mcx, mcy - mhh, mcz + mhd));
+        document.getElementById('dimLabelW').textContent = `W: ${wMm} mm`;
+        document.getElementById('dimLabelH').setAttribute('data-position', fmtPos(mcx + mhw, mcy, mcz + mhd));
+        document.getElementById('dimLabelH').textContent = `H: ${hMm} mm`;
+        document.getElementById('dimLabelD').setAttribute('data-position', fmtPos(mcx + mhw, mcy + mhh, mcz));
+        document.getElementById('dimLabelD').textContent = `D: ${dMm} mm`;
+      }
+    }
+
+    // ---- Three.js camera projection approach ----
+    // We access model-viewer's internal Three.js scene via its Symbol-keyed property
+    // (the same technique used by applyHandleVisibility above).
+    // This gives us the live camera matrices for reliable 3D → 2D projection,
+    // with no DOM timing issues whatsoever.
+
+    function getThreeCamera() {
+      const allSymbols = [
+        ...Object.getOwnPropertySymbols(viewer),
+        ...Object.getOwnPropertySymbols(Object.getPrototypeOf(viewer))
+      ];
+      const sceneSymbol = allSymbols.find(
+        s => s.description && s.description.includes('scene')
+      );
+      if (!sceneSymbol) return null;
+      const threeScene = viewer[sceneSymbol];
+      let cam = null;
+      if (threeScene && threeScene.traverse) {
+        threeScene.traverse(o => { if (o.isCamera && !cam) cam = o; });
+      }
+      return cam;
+    }
+
+    // Project a 3D world-space point (in the coordinate system of getDimensions /
+    // getBoundingBoxCenter) to viewer-relative 2D pixel coords.
+    // Uses camera.projectionMatrix × camera.matrixWorldInverse directly (column-major).
+    function projectPoint3D(wx, wy, wz) {
+      const cam = getThreeCamera();
+      if (!cam) return null;
+
+      const v = cam.matrixWorldInverse.elements;  // view matrix
+      const p = cam.projectionMatrix.elements;    // projection matrix
+
+      // World → view space
+      const ex = v[0] * wx + v[4] * wy + v[8] * wz + v[12];
+      const ey = v[1] * wx + v[5] * wy + v[9] * wz + v[13];
+      const ez = v[2] * wx + v[6] * wy + v[10] * wz + v[14];
+      const ew = v[3] * wx + v[7] * wy + v[11] * wz + v[15];
+
+      // View → clip space
+      const clipX = p[0] * ex + p[4] * ey + p[8] * ez + p[12] * ew;
+      const clipY = p[1] * ex + p[5] * ey + p[9] * ez + p[13] * ew;
+      const clipW = p[3] * ex + p[7] * ey + p[11] * ez + p[15] * ew;
+
+      if (clipW <= 0) return null; // behind camera
+
+      // NDC → viewer-relative pixel coords
+      const vr = viewer.getBoundingClientRect();
+      return {
+        x: (clipX / clipW + 1) / 2 * vr.width,
+        y: (-clipY / clipW + 1) / 2 * vr.height
+      };
+    }
+
+    // Draws dimension lines using Three.js camera projection (updates on camera-change)
+    function drawDimensionLines() {
+      if (!showDimensions || !dimData) return;
+      const { cx, cy, cz, hw, hh, hd } = dimData;
+
+      const wA = projectPoint3D(cx - hw, cy - hh, cz + hd);
+      const wB = projectPoint3D(cx + hw, cy - hh, cz + hd);
+      const hA = projectPoint3D(cx + hw, cy - hh, cz + hd);
+      const hB = projectPoint3D(cx + hw, cy + hh, cz + hd);
+      const dA = projectPoint3D(cx + hw, cy + hh, cz + hd);
+      const dB = projectPoint3D(cx + hw, cy + hh, cz - hd);
+
+      function setLine(id, a, b) {
+        const el = document.getElementById(id);
+        if (!el || !a || !b) return;
+        el.setAttribute('x1', a.x); el.setAttribute('y1', a.y);
+        el.setAttribute('x2', b.x); el.setAttribute('y2', b.y);
+      }
+      function drawTick(a, b, id1, id2) {
+        if (!a || !b) return;
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const nx = (-dy / len) * 7, ny = (dx / len) * 7;
+        const e1 = document.getElementById(id1), e2 = document.getElementById(id2);
+        if (e1) { e1.setAttribute('x1', a.x + nx); e1.setAttribute('y1', a.y + ny); e1.setAttribute('x2', a.x - nx); e1.setAttribute('y2', a.y - ny); }
+        if (e2) { e2.setAttribute('x1', b.x + nx); e2.setAttribute('y1', b.y + ny); e2.setAttribute('x2', b.x - nx); e2.setAttribute('y2', b.y - ny); }
+      }
+
+      setLine('dimLineW', wA, wB); drawTick(wA, wB, 'dimTickWa', 'dimTickWb');
+      setLine('dimLineH', hA, hB); drawTick(hA, hB, 'dimTickHa', 'dimTickHb');
+      setLine('dimLineD', dA, dB); drawTick(dA, dB, 'dimTickDa', 'dimTickDb');
+    }
+
+    const dimAnchorIds = {
+      w: ['dimAnchorWa', 'dimAnchorWb'],
+      h: ['dimAnchorHa', 'dimAnchorHb'],
+      d: ['dimAnchorDa', 'dimAnchorDb']
+    };
+
+    // 尺寸标注调参区：
+    // 1. 先调 originWorldOffset*，把三轴交点放到合适的位置。
+    // 2. 再调 w/h/dEndOffset*，分别控制三条线终点的位置，也就是每条线的长度和贴边程度。
+    // 3. 最后用 screenShiftX/Y 做屏幕上的整体微调，用 labelOffset 调整文字离线的距离。
+    const dimensionConfig = {
+      // 三轴公共原点在 3D 模型坐标里的偏移
+      // X: 左右, Y: 上下, Z: 前后深度
+      originWorldOffsetX: 0.02,
+      originWorldOffsetY: 0.06,
+      originWorldOffsetZ: -0.07,
+
+      // 宽度线终点偏移
+      // 常用: wEndOffsetX 调宽度线长短
+      wEndOffsetX: -0.06,
+      wEndOffsetY: 0,
+      wEndOffsetZ: 0,
+
+      // 高度线终点偏移
+      // 常用: hEndOffsetY 调高度线长短
+      hEndOffsetX: 0,
+      hEndOffsetY: -0.04,
+      hEndOffsetZ: 0,
+
+      // 深度线终点偏移
+      // 常用: dEndOffsetZ 调深度线长短
+      dEndOffsetX: 0,
+      dEndOffsetY: 0,
+      dEndOffsetZ: 0.01,
+
+      // 屏幕空间整体微调
+      // X: 整组三轴左右移动, Y: 整组三轴上下移动
+      screenShiftX: -96,
+      screenShiftY: -78,
+
+      // 标签离尺寸线的距离，数值越大文字离线越远
+      labelOffset: 10
+    };
+
+    function setHotspotPosition(id, x, y, z) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const position = fmtPos(x, y, z);
+      el.setAttribute('data-position', position);
+
+      if (typeof viewer.updateHotspot === 'function' && el.slot) {
+        viewer.updateHotspot({
+          name: el.slot,
+          position
+        });
+      }
+    }
+
+    function getHotspotScreenPoint(id, viewerRect) {
+      const el = document.getElementById(id);
+      if (!el) return null;
+
+      const rect = el.getBoundingClientRect();
+      if (!rect.width && !rect.height && !rect.left && !rect.top) return null;
+
+      return {
+        x: rect.left - viewerRect.left + rect.width / 2,
+        y: rect.top - viewerRect.top + rect.height / 2
+      };
+    }
+
+    function clearDimensionLines() {
+      const lineIds = [
+        'dimLineW', 'dimLineH', 'dimLineD',
+        'dimTickWa', 'dimTickWb', 'dimTickHa', 'dimTickHb', 'dimTickDa', 'dimTickDb'
+      ];
+
+      lineIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.setAttribute('x1', '0');
+        el.setAttribute('y1', '0');
+        el.setAttribute('x2', '0');
+        el.setAttribute('y2', '0');
+      });
+    }
+
+    function setupDimensions() {
+      const size = viewer.getDimensions();
+      const center = viewer.getBoundingBoxCenter();
+      if (!size || !center) return;
+
+      const mhw = size.x / 2;
+      const mhh = size.y / 2;
+      const mhd = size.z / 2;
+      const { x: mcx, y: mcy, z: mcz } = center;
+
+      const wMm = Math.round(size.x * 1000);
+      const hMm = Math.round(size.y * 1000);
+      const dMm = Math.round(size.z * 1000);
+
+      const {
+        originWorldOffsetX,
+        originWorldOffsetY,
+        originWorldOffsetZ,
+        wEndOffsetX,
+        wEndOffsetY,
+        wEndOffsetZ,
+        hEndOffsetX,
+        hEndOffsetY,
+        hEndOffsetZ,
+        dEndOffsetX,
+        dEndOffsetY,
+        dEndOffsetZ
+      } = dimensionConfig;
+
+      const origin = {
+        x: mcx - mhw + originWorldOffsetX,
+        y: mcy - mhh + originWorldOffsetY,
+        z: mcz + mhd + originWorldOffsetZ
+      };
+      const wEnd = {
+        x: mcx + mhw + wEndOffsetX,
+        y: mcy - mhh + originWorldOffsetY + wEndOffsetY,
+        z: mcz + mhd + originWorldOffsetZ + wEndOffsetZ
+      };
+      const hEnd = {
+        x: mcx - mhw + originWorldOffsetX + hEndOffsetX,
+        y: mcy + mhh + hEndOffsetY,
+        z: mcz + mhd + originWorldOffsetZ + hEndOffsetZ
+      };
+      const dEnd = {
+        x: mcx - mhw + originWorldOffsetX + dEndOffsetX,
+        y: mcy - mhh + originWorldOffsetY + dEndOffsetY,
+        z: mcz - mhd + dEndOffsetZ
+      };
+
+      const dimLabelW = document.getElementById('dimLabelW');
+      const dimLabelH = document.getElementById('dimLabelH');
+      const dimLabelD = document.getElementById('dimLabelD');
+      [dimLabelW, dimLabelH, dimLabelD].forEach(label => {
+        if (!label) return;
+        label.removeAttribute('slot');
+      });
+      dimLabelW.textContent = `W: ${wMm} mm`;
+      dimLabelH.textContent = `H: ${hMm} mm`;
+      dimLabelD.textContent = `D: ${dMm} mm`;
+
+      setHotspotPosition('dimAnchorWa', origin.x, origin.y, origin.z);
+      setHotspotPosition('dimAnchorWb', wEnd.x, wEnd.y, wEnd.z);
+      setHotspotPosition('dimAnchorHa', origin.x, origin.y, origin.z);
+      setHotspotPosition('dimAnchorHb', hEnd.x, hEnd.y, hEnd.z);
+      setHotspotPosition('dimAnchorDa', origin.x, origin.y, origin.z);
+      setHotspotPosition('dimAnchorDb', dEnd.x, dEnd.y, dEnd.z);
+    }
+
+    function drawDimensionLines() {
+      if (!showDimensions) return;
+
+      const viewerRect = viewer.getBoundingClientRect();
+      const wA = getHotspotScreenPoint(dimAnchorIds.w[0], viewerRect);
+      const wB = getHotspotScreenPoint(dimAnchorIds.w[1], viewerRect);
+      const hA = getHotspotScreenPoint(dimAnchorIds.h[0], viewerRect);
+      const hB = getHotspotScreenPoint(dimAnchorIds.h[1], viewerRect);
+      const dA = getHotspotScreenPoint(dimAnchorIds.d[0], viewerRect);
+      const dB = getHotspotScreenPoint(dimAnchorIds.d[1], viewerRect);
+
+      const baseOrigin = wA || hA || dA || null;
+
+      function normalize(dx, dy) {
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        return { x: dx / len, y: dy / len };
+      }
+
+      const { screenShiftX, screenShiftY, labelOffset } = dimensionConfig;
+      const shiftedOrigin = baseOrigin
+        ? {
+          x: baseOrigin.x + screenShiftX,
+          y: baseOrigin.y + screenShiftY
+        }
+        : null;
+
+      function shiftedPoint(point) {
+        if (!point || !shiftedOrigin || !baseOrigin) return null;
+        return {
+          x: point.x + screenShiftX,
+          y: point.y + screenShiftY
+        };
+      }
+
+      const shiftedW = { origin: shiftedOrigin, end: shiftedPoint(wB) };
+      const shiftedH = { origin: shiftedOrigin, end: shiftedPoint(hB) };
+      const shiftedD = { origin: shiftedOrigin, end: shiftedPoint(dB) };
+
+      function positionLabel(id, a, b, extraOffset = 16) {
+        const label = document.getElementById(id);
+        if (!label || !a || !b) return;
+        const dir = normalize(b.x - a.x, b.y - a.y);
+        const perp = { x: -dir.y, y: dir.x };
+        const mid = {
+          x: (a.x + b.x) / 2 + perp.x * extraOffset,
+          y: (a.y + b.y) / 2 + perp.y * extraOffset
+        };
+        label.style.left = `${mid.x}px`;
+        label.style.top = `${mid.y}px`;
+      }
+
+      function setLine(id, a, b) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!a || !b) {
+          el.setAttribute('x1', '0');
+          el.setAttribute('y1', '0');
+          el.setAttribute('x2', '0');
+          el.setAttribute('y2', '0');
+          return;
+        }
+
+        el.setAttribute('x1', a.x);
+        el.setAttribute('y1', a.y);
+        el.setAttribute('x2', b.x);
+        el.setAttribute('y2', b.y);
+      }
+
+      function drawTick(a, b, id1, id2) {
+        const e1 = document.getElementById(id1);
+        const e2 = document.getElementById(id2);
+        if (!a || !b) {
+          if (e1) {
+            e1.setAttribute('x1', '0');
+            e1.setAttribute('y1', '0');
+            e1.setAttribute('x2', '0');
+            e1.setAttribute('y2', '0');
+          }
+          if (e2) {
+            e2.setAttribute('x1', '0');
+            e2.setAttribute('y1', '0');
+            e2.setAttribute('x2', '0');
+            e2.setAttribute('y2', '0');
+          }
+          return;
+        }
+
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const nx = (-dy / len) * 7;
+        const ny = (dx / len) * 7;
+
+        if (e1) {
+          e1.setAttribute('x1', '0');
+          e1.setAttribute('y1', '0');
+          e1.setAttribute('x2', '0');
+          e1.setAttribute('y2', '0');
+        }
+        if (e2) {
+          e2.setAttribute('x1', b.x + nx);
+          e2.setAttribute('y1', b.y + ny);
+          e2.setAttribute('x2', b.x - nx);
+          e2.setAttribute('y2', b.y - ny);
+        }
+      }
+
+      setLine('dimLineW', shiftedW.origin, shiftedW.end);
+      drawTick(shiftedW.origin, shiftedW.end, 'dimTickWa', 'dimTickWb');
+      setLine('dimLineH', shiftedH.origin, shiftedH.end);
+      drawTick(shiftedH.origin, shiftedH.end, 'dimTickHa', 'dimTickHb');
+      setLine('dimLineD', shiftedD.origin, shiftedD.end);
+      drawTick(shiftedD.origin, shiftedD.end, 'dimTickDa', 'dimTickDb');
+
+      positionLabel('dimLabelW', shiftedW.origin, shiftedW.end, labelOffset);
+      positionLabel('dimLabelH', shiftedH.origin, shiftedH.end, labelOffset);
+      positionLabel('dimLabelD', shiftedD.origin, shiftedD.end, labelOffset);
+    }
+
+    let dimensionLoopFrame = 0;
+
+    function stopDimensionLoop() {
+      if (dimensionLoopFrame) {
+        cancelAnimationFrame(dimensionLoopFrame);
+        dimensionLoopFrame = 0;
+      }
+    }
+
+    function startDimensionLoop() {
+      stopDimensionLoop();
+
+      const tick = () => {
+        if (!showDimensions || !isAutoRotating) {
+          dimensionLoopFrame = 0;
+          return;
+        }
+
+        drawDimensionLines();
+        dimensionLoopFrame = requestAnimationFrame(tick);
+      };
+
+      dimensionLoopFrame = requestAnimationFrame(tick);
+    }
+
+    // Toggle dimension overlay on/off
+    window.toggleDimensions = function () {
+      showDimensions = !showDimensions;
+      const dimBtn = document.getElementById('dimBtn');
+      const dimLabel = document.getElementById('dimLabel');
+      const dimSvg = document.getElementById('dimSvg');
+      const labels = document.querySelectorAll('.dim-label');
+
+      if (showDimensions) {
+        dimBtn.classList.add('open');
+        dimLabel.textContent = 'Hide Dimensions';
+        dimSvg.style.opacity = '1';
+        labels.forEach(l => l.classList.add('visible'));
+        // projectPoint3D reads live camera matrices – no timing issues, draw immediately
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (showDimensions) {
+              drawDimensionLines();
+              if (isAutoRotating) startDimensionLoop();
+            }
+          });
+        });
+      } else {
+        dimBtn.classList.remove('open');
+        dimLabel.textContent = 'Show Dimensions';
+        dimSvg.style.opacity = '0';
+        labels.forEach(l => l.classList.remove('visible'));
+        stopDimensionLoop();
+        clearDimensionLines();
+      }
+    };
+
+    // Redraw SVG lines whenever the camera moves.
+    // Use requestAnimationFrame so Three.js has finished updating all world/camera
+    // matrices before we read them; without rAF we'd get last-frame values.
+    viewer.addEventListener('camera-change', () => {
+      if (showDimensions) drawDimensionLines();
+    });
+
     // --- Auto-rotate toggle logic ---
     let isAutoRotating = true; // default in HTML is that it has auto-rotate attribute
 
@@ -1690,10 +2320,12 @@
         viewer.setAttribute('auto-rotate', '');
         rotateBtn.classList.add('open');
         rotateLabel.textContent = 'Stop Auto-Rotate';
+        if (showDimensions) startDimensionLoop();
       } else {
         viewer.removeAttribute('auto-rotate');
         rotateBtn.classList.remove('open');
         rotateLabel.textContent = 'Start Auto-Rotate';
+        stopDimensionLoop();
       }
     };
 
